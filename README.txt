@@ -1,44 +1,165 @@
-Agentic TDD. I'd like to creata 4 AI agents to develop software in TDD approach. 
+Agentic TDD
+===========
 
-Agent 1 - controller
-  - coordinates other agents,
-  - monitors progress,
-  - acts when some action takes too long,
-  - reports progres general progres (observability), 
-  - reports any issues in the pipeline,
+Project manifest
 
-Agent 2 - task analyst
-  - able to translate customer input into acceptance criteria,
-  - able to ask questions,
-  - should create a list of detailed requirements described as facts about the system behaviour
-  - define expected performance criteria / execution context, scale, expected load etc
-  - as a result generates detailed task description
+Purpose
+-------
 
-Agent 3 - coding: works in a loop:
-1. take next acceptance criteria / requirement, 
-  - it should start from the simplest requirements, edge cases, input params validators etc gradualy extending solution with more complex behaviour.
-2. implement related tests/facts 
-  - XUnit + Fluent Assertions preffered,
-  - extremal human-readability expected,
-  - only in test project.
-  - tests should fail at that point [RED]
-  - commit
-3. implement a minimal change that makes tests passing [GREEN]
-  - commit
-4. Rigorous refactor (src & test code):
-  - removes any code duplications,
-  - improve readability,
-  - keeps SOLID principles,
-  - extracts abstractions or improve existing ones, including an extensive redesign of existing code if necessary.
-  - commit
-5. asks engineer in case of any ambiguity. After implementation engineer's decisions should be used to update coding skill. 
-6. finally commits the change with full explanation of decisions made.
-7. after each loop asks Agent 4 for quality approval: if approved goes to step 1, else apply required improvements and update its codin skills.
+Explore a reliable, human-supervised workflow in which AI agents help deliver
+software using test-driven development (TDD). The project begins with a small
+pilot and adds automation only after the workflow demonstrates that it can
+produce correct, understandable, maintainable changes.
 
-Agent 4 - quality guard 
-- checks if each line of src code is covered by tests. There might be exceptions, but must be accepted by engineer.
-- checks if there is any verbosity in the code that obscures the main logic (src or tests), extremal human-readability expected (this can be a skill built with engineer)
-- checks if methods/classes/dependencies are well defined, compliant with SOLID principles and any other custom skills already defined 
-- double checks if implemented tests are matching initial requirements
-- if any criteria criteria is not met - returns feedback to Agent 3 that should either start from step 1 or just update the changes as part of the step 4,
-- if there are any doubts asks engineer to double check the quality and approve, then based on engineer's decision - improves the quality check skill
+The engineer remains accountable for product decisions, design approval,
+exceptions to quality gates, and final acceptance.
+
+Goals
+-----
+
+- Translate customer requests into clear, testable acceptance criteria.
+- Implement behavior incrementally using a red-green-refactor cycle.
+- Keep changes reviewable, tests meaningful, and delivery results observable.
+- Make handoffs, decisions, failures, and recovery steps explicit.
+- Measure quality, iteration cost, and delivery performance before increasing
+  agent autonomy.
+
+Initial workflow
+----------------
+
+Begin with three active roles: task analyst, coding agent, and independent
+quality reviewer. The engineer coordinates the pilot and approves decisions.
+Use deterministic workflow logic for status, deadlines, retries, and routing
+where practical; these concerns do not require an always-running AI agent.
+
+Roles
+-----
+
+1. Controller (later automation)
+   - Coordinates work and routes artifacts between roles.
+   - Tracks status, deadlines, retries, and blockers.
+   - Reports progress and pipeline issues.
+   - Uses deterministic automation for timers and state transitions where
+     possible; escalates stalled or unrecoverable work to an engineer.
+
+2. Task analyst
+   - Clarifies the customer's goal, scope, terminology, and unanswered
+     questions before implementation.
+   - Produces observable, independently verifiable acceptance criteria.
+   - Defines expected execution context, scale, workload, and measurable
+     performance requirements when relevant.
+   - Separates confirmed requirements from assumptions and open decisions.
+   - Does not prescribe implementation details unless the customer explicitly
+     requires them.
+
+3. Coding agent
+   - Selects one approved acceptance criterion at a time, starting with
+     straightforward behavior and input validation before more complex cases.
+   - Proposes implementation choices and obtains engineer approval when the
+     choice materially affects architecture, behavior, or tradeoffs.
+   - Implements using the red-green-refactor loop described below.
+   - Explains decisions, tradeoffs, and any remaining limitations.
+   - Proposes updates to coding guidance when engineer feedback reveals a
+     reusable rule; guidance changes require engineer review.
+
+4. Quality reviewer
+   - Independently checks the implementation and tests against the approved
+     acceptance criteria.
+   - Verifies that tests assert required behavior, including relevant edge
+     cases, concurrency, and failure behavior.
+   - Reviews readability, unnecessary complexity, duplication, design
+     boundaries, and applicable SOLID principles.
+   - Checks test, build, formatting, static-analysis, and coverage results
+     required by the repository.
+   - Gives specific, actionable feedback tied to a criterion or quality gate.
+     Unresolved ambiguity or disagreement is escalated to an engineer.
+   - Proposes quality-guidance updates for engineer review; it does not
+     silently change its own rules.
+
+Delivery process
+----------------
+
+1. Intake: The analyst asks questions, records scope and assumptions, and
+   drafts acceptance criteria. The engineer resolves open decisions and
+   approves the criteria before coding begins.
+2. Design: For decisions with meaningful tradeoffs, the coding agent presents
+   an implementation proposal. The engineer approves it before implementation.
+3. Red: The coding agent adds focused tests in the test project for one
+   approved criterion and runs them to verify they fail for the intended
+   reason. Do not leave a shared branch broken solely to preserve a RED-stage
+   commit.
+4. Green: Implement the smallest production change that satisfies the tests.
+   Run the targeted tests and relevant existing checks.
+5. Refactor: Improve production and test code for clarity and maintainability
+   while keeping the suite green. Avoid abstractions that do not serve the
+   requirements.
+6. Review: The independent reviewer checks the change against the approved
+   criteria and quality gates. The coding agent addresses feedback in a
+   bounded revision loop; escalate persistent disagreements to the engineer.
+7. Repeat: After approval, proceed to the next criterion. The engineer reviews
+   the complete change before merge.
+
+Commit at useful, reviewable checkpoints, with passing tests for shared
+changes. Commit messages and the final handoff should explain the behavior
+delivered and important decisions.
+
+Requirements and work tracking
+------------------------------
+
+- Keep each acceptance criterion small enough to verify independently.
+- Track status and link every criterion to its tests, implementation change,
+  review outcome, and relevant engineer decision.
+- Define handoff ownership, timeout behavior, retry limits, and escalation
+  before automating the workflow.
+- Make failures visible. A stalled or failed task must leave work status and
+  repository state understandable and recoverable.
+- Keep CI as the reproducible source of truth for builds, tests, formatting,
+  and static analysis.
+
+Quality principles
+------------------
+
+- Optimize for tests that verify behavior, not for a line-coverage number
+  alone. Set meaningful coverage expectations for important behavior and
+  document engineer-approved exceptions.
+- Consider branch coverage or mutation testing when they add useful evidence.
+- Prefer readable production code and tests over verbosity or unnecessary
+  abstractions.
+- Use an independent reviewer; a different model from the coding agent may
+  help reduce shared blind spots.
+- Record engineer decisions as project guidance. Changes to agent instructions
+  or skills are proposals until reviewed and approved.
+
+Models
+------
+
+Choose models by capability and evaluate them on representative tasks from the
+target repository. Favor strong reasoning and careful instruction-following
+for analysis and review, strong coding ability and repository context for
+implementation, and speed and cost-efficiency for routine orchestration.
+Model availability changes by Copilot plan and organization; validate the
+options currently available rather than relying on fixed model names.
+
+Pilot and success measures
+--------------------------
+
+1. Use one small, low-risk feature with explicit engineer approval between
+   analysis, design, implementation, and final review.
+2. Record missed requirements, review iterations, CI failures, cycle time, and
+   whether the resulting change is understandable and maintainable.
+3. For performance requirements, record benchmark workload, environment,
+   duration, throughput, and relevant latency. Do not claim a target is met
+   without measurements.
+4. Improve prompts, workflow, and quality gates based on observed results.
+5. Automate repeatable handoffs and increase autonomy only after the pilot is
+   reliable. Keep human approval for ambiguous requirements and significant
+   design decisions.
+
+Scope boundaries
+----------------
+
+This project develops and evaluates an agent-assisted software delivery
+workflow. An agent's implementation must not claim guarantees that the
+designed system does not provide. Product-specific guarantees, data durability,
+security, and operational requirements must be explicit acceptance criteria
+and verified independently.
