@@ -42,3 +42,43 @@ Agent 4 - quality guard
 - double checks if implemented tests are matching initial requirements
 - if any criteria criteria is not met - returns feedback to Agent 3 that should either start from step 1 or just update the changes as part of the step 4,
 - if there are any doubts asks engineer to double check the quality and approve, then based on engineer's decision - improves the quality check skill
+
+
+Suggested delivery approach
+===========================
+
+Start with a small, human-supervised pilot rather than four autonomous agents. Use a task analyst, coding agent, and independent quality reviewer first. Keep the controller's scheduling, deadlines, retries, and status tracking in deterministic workflow logic where possible; use an agent for decisions that require reasoning, not as a continuously polling timer.
+
+Work tracking and handoffs
+--------------------------
+
+- Break work into small, independently verifiable acceptance criteria.
+- Track each criterion's status and link it to its tests, implementation change, review result, and any engineer decision.
+- Define explicit handoffs, timeout behavior, retry limits, and escalation to an engineer. A failed or stalled task must leave the branch and work status in a known, recoverable state.
+- Keep CI as the reproducible source of truth for builds, tests, formatting, and static analysis.
+
+TDD and commits
+--------------
+
+For each criterion, write a focused behavior test and run it first to verify it fails for the intended reason (RED). Implement the smallest change that makes it pass (GREEN), then refactor production and test code while keeping the suite green. Commit at useful, reviewable points. A RED-stage test does not need to be committed while failing; avoid leaving shared branches in a broken state.
+
+Quality gates
+-------------
+
+- Prefer tests that verify required behavior over a target of 100% line coverage. Set meaningful coverage goals for important behavior, and consider branch coverage or mutation testing where useful.
+- Have the reviewer independently compare the acceptance criteria, tests, and implementation. A different model from the coding agent can help reduce shared blind spots.
+- Make review feedback actionable and tied to a criterion or quality rule. Set a bounded revision loop and escalate unresolved disagreements or ambiguity to an engineer.
+- Keep engineer decisions as recorded project guidance. Propose changes to agent instructions or skills for review; do not silently let agents rewrite their own rules.
+
+Agent and model selection
+-------------------------
+
+Choose models by capability and evaluate them on representative tasks from the target repository. Favor strong reasoning and instruction-following for analysis and review, strong coding ability and repository context for implementation, and speed and cost-efficiency for routine orchestration. Model availability changes by Copilot plan and organization, so validate the currently available options rather than relying on a fixed model-name recommendation.
+
+Pilot sequence
+--------------
+
+1. Start with one small, low-risk feature and explicit engineer approval between stages.
+2. Measure whether the workflow produces correct, maintainable changes and catches missed requirements; record cycle time, review iterations, and CI failures.
+3. Improve the prompts, workflow, and quality gates based on observed results.
+4. Increase autonomy only after the pilot is reliable; retain human approval for ambiguous requirements and significant design decisions.
