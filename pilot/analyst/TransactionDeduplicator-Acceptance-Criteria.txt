@@ -63,10 +63,14 @@ Acceptance criteria
    The number of retained active transaction IDs must not exceed
    UniqnessBufferCapacity.
    When a valid, previously unseen ID arrives and capacity is full after
-   expired IDs have been reclaimed, the operation throws a dedicated
-   CapacityExceededException and does not register that ID.
+   expired IDs have been reclaimed, the new ID is not accepted and the active
+   transaction state remains unchanged.
    A duplicate of an active ID is still identified and returns false when the
    buffer is at capacity.
+   The caller must be able to distinguish a capacity rejection from a
+   successfully processed ID or a duplicate. The mechanism for communicating
+   this outcome is an API/design decision, not a business acceptance
+   criterion; see the behavior-decision log.
 
 7. Thread safety
    Concurrent calls are safe. If multiple calls for the same previously

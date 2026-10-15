@@ -25,10 +25,12 @@ When configuring an agent, explicitly make this skill available to it.
 - Check whether requested guarantees are compatible. State material
   limitations plainly; do not claim guarantees that the described scope cannot
   provide.
-- Keep implementation choices (data structures, algorithms, frameworks, and
-  architecture) out of acceptance criteria unless the engineer explicitly
-  requires them. Hand meaningful design choices to the coding agent for a
-  proposal and engineer approval.
+- Keep technical/API choices (data structures, algorithms, frameworks,
+  architecture, exception types, and result shapes) out of business
+  acceptance criteria. Record explicit engineer decisions about these choices
+  in the decision log and hand them to the coding agent as design constraints,
+  distinct from behavioral requirements. The coding agent should surface them
+  in its design proposal for confirmation where appropriate.
 - Before presenting criteria as approved, verify that every material
   ambiguity is resolved or clearly marked as an open question requiring
   approval.
@@ -94,4 +96,6 @@ Before handing off, confirm that:
 - Exact boundaries, units, defaults, and error outcomes are stated where
   necessary to make tests deterministic.
 - Performance claims include a measurable workload and verification plan.
-- Design recommendations are not presented as behavioral requirements.
+- Technical/API decisions and design recommendations are not presented as
+  business behavioral requirements; approved technical decisions remain
+  visible to the coding agent through the decision log.

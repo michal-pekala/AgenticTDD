@@ -24,10 +24,11 @@ retrospective; no exact historical decision times are inferred.
 - Context/question: Exact deduplication with bounded memory needs behavior
   when the configured maximum is reached; deliberately throwing
   `OutOfMemoryException` would misrepresent runtime memory exhaustion.
-- Engineer decision: Throw a dedicated `CapacityExceededException` for a new
-  ID when capacity is full. Do not throw `OutOfMemoryException`.
-- Affected criteria: Capacity limit; API error behavior.
-- Status: Active
+- Engineer decision: Use a dedicated `CapacityExceededException` for a new ID
+  when capacity is full. Do not throw `OutOfMemoryException`.
+- Affected area: API/design behavior when capacity is exhausted.
+- Status: Active as an API/design decision; not a business acceptance
+  criterion. See D-012.
 
 ### D-003 - Capacity is configurable and measured
 
@@ -131,6 +132,21 @@ retrospective; no exact historical decision times are inferred.
 - Affected criteria: Performance and bounded memory; performance verification.
 - Status: Active
 
+### D-012 - Keep technical API choices out of business acceptance criteria
+
+- Recorded at: 2026-10-15T14:15:21+02:00
+- Decision time: 2026-10-15T14:15:21+02:00
+- Context/question: The capacity criterion specified a particular exception
+  type, which is an API/technical choice rather than business behavior.
+- Engineer decision: Business acceptance criteria describe the outcome:
+  reject a new unseen ID at capacity without changing active state, while
+  continuing to recognize active duplicates. Keep the mechanism for
+  communicating capacity rejection out of business criteria. Preserve D-002
+  as a separately recorded API/design decision for the coding agent.
+- Affected criteria: Capacity limit; analyst handoff responsibilities.
+- Status: Active; D-002 remains a design/API decision, not an acceptance
+  criterion.
+
 ## Consistency review
 
 These entries were backfilled from the pilot discussion. D-003 and D-009 are
@@ -142,4 +158,6 @@ O(1); it does not prescribe a data structure, consistent with D-010.
 No unresolved contradiction was identified in the recorded decisions at the
 time this log was created. Re-check the relevant sequence whenever a new
 explicit engineer decision is added and before publishing revised acceptance
-criteria.
+criteria. D-012 clarifies that D-002 specifies an approved API/design choice,
+while the business acceptance criterion states only the capacity behavior and
+outcome; these apply at distinct layers and do not conflict.
