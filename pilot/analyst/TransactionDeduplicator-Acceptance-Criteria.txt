@@ -1,0 +1,110 @@
+Transaction Deduplicator - Analyst Handoff
+==========================================
+
+Purpose
+-------
+
+This document records the approved, observable acceptance criteria for the
+TransactionDeduplicator pilot. It is an analyst output for the coding agent.
+It specifies required behavior and constraints, not an implementation design.
+The coding agent must propose its implementation approach and obtain engineer
+approval for that approach before implementing it.
+
+Scope
+-----
+
+The component provides:
+
+    bool IsUniqueAndProcess(string transactionId)
+
+It performs in-memory, process-local duplicate detection over a configurable
+expiration window. It does not provide durable or distributed transaction
+guarantees.
+
+Configuration
+-------------
+
+- UniqnessCheckExpiration is configurable and defaults to 10 seconds.
+- UniqnessBufferCapacity is configurable and defaults to 1M active transaction
+  IDs.
+- Configuration values must be positive. Invalid configuration must be
+  reported clearly during component configuration or construction.
+
+Acceptance criteria
+-------------------
+
+1. First-seen transaction
+   Given a valid GUID that is not currently active, when it is processed, the
+   method returns true and records the transaction ID as active.
+
+2. Active duplicate
+   Given a transaction ID that is currently active, when the same ID is
+   processed, the method returns false and refreshes that ID's expiration from
+   the time of the duplicate attempt.
+
+3. Expiration boundary
+   An ID remains active until its most recent attempt plus
+   UniqnessCheckExpiration. At the exact expiration instant it is expired and
+   may be accepted again.
+
+4. GUID identity and invalid input
+   GUID strings that represent the same GUID are treated as the same
+   transaction ID, regardless of differences in textual casing or supported
+   GUID formatting.
+   Null, empty, whitespace-only, or malformed GUID input throws
+   ArgumentException. Invalid input must not change deduplication state.
+
+5. Expired-entry reclamation
+   Expired IDs are reclaimed before applying the capacity check for a new ID.
+   Expiration and duplicate refresh behavior must not allow stale entries or
+   expiry bookkeeping to grow without bound.
+
+6. Capacity limit
+   The number of retained active transaction IDs must not exceed
+   UniqnessBufferCapacity.
+   When a valid, previously unseen ID arrives and capacity is full after
+   expired IDs have been reclaimed, the operation throws a dedicated
+   CapacityExceededException and does not register that ID.
+   A duplicate of an active ID is still identified and returns false when the
+   buffer is at capacity.
+
+7. Thread safety
+   Concurrent calls are safe. If multiple calls for the same previously
+   unseen ID race, at most one call returns true; all other calls observe it
+   as a duplicate. Capacity enforcement, duplicate refresh, and expiration
+   must remain consistent under concurrent calls.
+
+8. Process-local behavior
+   State is held in memory in this process only. It is not persisted across
+   process restarts and is not shared with other instances. This component
+   alone does not guarantee ACID behavior or prevent duplicate processing
+   across processes or machines.
+
+9. Performance and bounded memory
+   The performance target is 100,000 total calls per second, with 80% of calls
+   being duplicates and 20% being new transaction IDs. Under the default
+   10-second window, this workload implies approximately 200,000 distinct
+   active IDs at steady state, below the default capacity of 1,000,000.
+   Lookup and registration should target expected O(1) behavior; linear
+   worst-case behavior is allowed. The implementation approach is a coding
+   decision and must be proposed by the coding agent for engineer approval.
+   Retained IDs and any expiration-related bookkeeping must remain bounded by
+   the configured capacity, including when duplicates repeatedly refresh
+   expiration.
+
+10. Performance verification
+    A representative benchmark must exercise the stated throughput and
+    duplicate mix. Record the hardware/runtime environment, benchmark
+    duration, achieved throughput, and relevant latency results. The
+    benchmark must make clear whether it meets the 100,000 calls/second
+    target; do not claim the target is met without measured results.
+
+Out of scope
+------------
+
+- Durable deduplication across process restarts.
+- Coordination or shared state across service instances.
+- ACID guarantees for downstream transaction execution.
+- A specific data structure, locking strategy, or eviction algorithm; these
+  are design decisions for the coding agent to propose and the engineer to
+  approve.

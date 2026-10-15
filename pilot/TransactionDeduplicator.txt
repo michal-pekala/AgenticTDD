@@ -1,0 +1,22 @@
+
+Task Description: High-Throughput Transaction Deduplicator
+
+
+Context
+
+In high-volume financial streaming platforms (such as payment gateways, core ledgers, or asynchronous billing networks), network glitches and transient client timeouts frequently cause upstream infrastructure to retry HTTP/gRPC requests. To guarantee strict data consistency, adhere to ACID properties, and mitigate the risk of double-spending or duplicate account debits, the payment core must ingest a high-frequency stream of transactional signals and deduplicate them in real time within a moving sliding time-window of X seconds.
+
+
+Objective
+
+Implement a highly optimized, thread-safe component TransactionDeduplicator that evaluates incoming transaction unique identifiers and state.
+The system exposes the following core entry point:
+public bool IsUniqueAndProcess(string transactionId)
+• If the transactionId has NOT been seen within the designated active sliding time window, the system must register it, track its temporal lifespan, and return true (allowing downstream transaction execution to proceed).
+• If the transactionId HAS already been registered within the active sliding time window, the system must short-circuit the execution path, reject the payload, and return false (dropping the duplicate retry signal).
+
+Constraints & Performance Requirements
+
+1. Time Complexity: The validation gate must run in strict O(1) continuous time for both transaction status lookup and registration metrics.
+2. Memory Footprint & Eviction Strategy (The Bounded Memory Gate): To avoid memory exhaustion (OutOfMemoryException) on long-running chmurowe compute clusters processing millions of financial events per day, transactions older than the sliding window threshold must be continuously and efficiently evicted from memory. The storage architecture must maintain a strictly bounded memory footprint over time.
+3. High Concurrency & Low Allocation: The pipeline will be subjected to intense thread contention (retry storms). The implementation should minimize dynamic memory allocations on the managed heap to remain highly friendly to the Garbage Collector (GC Generation 0/1 pressure) and leverage non-blocking or lightweight lock-free synchronization primitives where possible.
