@@ -28,6 +28,116 @@ Studio under the `engineering` solution folder.
 - Keep recommendations and unapproved design choices labeled as proposals.
   Do not silently turn them into requirements or decisions.
 
+## Consolidated engineer decisions
+
+This section consolidates the active decisions in
+`pilot/coder/engineering-decisions.md` and the approved behavior decisions
+D-001 through D-013 in `pilot/analyst/behaviour-decisions.md`. The decision
+logs remain the detailed historical record; this skill is the coding
+checklist. If a newer decision changes one of these instructions, append it
+to the coder log and update this section without deleting the history.
+
+### Required behavior and API/design constraints
+
+- Implement `bool IsUniqueAndProcess(string transactionId)` for an in-memory,
+  process-local instance. Do not claim persistence across restarts, sharing
+  between instances/processes/machines, or ACID guarantees.
+- Accept valid GUID values. Use generated default-format GUIDs
+  (`Guid.NewGuid().ToString()`) for generic happy-path tests. Normalize
+  supported GUID representations so equivalent values identify one
+  transaction. Use fixed GUIDs only when identity or formatting itself is
+  under test.
+- Null, empty, whitespace-only, and malformed IDs throw `ArgumentException`
+  without changing state.
+- A first-seen active-window ID returns `true`. An active duplicate returns
+  `false` and refreshes expiration from that duplicate attempt. Expiration is
+  exactly at last attempt plus configured duration; at the boundary the ID
+  is expired and can be accepted again.
+- `UniqnessCheckExpiration` defaults to 10 seconds and
+  `UniqnessBufferCapacity` defaults to 1,000,000 active IDs. Both are
+  configurable and positive. Invalid configuration is reported clearly from
+  an operation call before state changes; the constructor does not throw for
+  invalid options.
+- Reclaim expired IDs before capacity handling. Active duplicates remain
+  recognized at capacity. If a valid unseen ID arrives when capacity remains
+  full after reclamation, do not accept it or change active state.
+- D-002 separately requires a dedicated `CapacityExceededException`, not
+  `OutOfMemoryException`. This is an approved API/design constraint, not a
+  business acceptance criterion. Test the behavioral result (rejected new
+  ID, unchanged active state, duplicates still recognized) separately from
+  the exception-type API contract.
+- Calls must be thread-safe: concurrent first calls for the same unseen ID
+  produce at most one `true`, and expiration, refresh, and capacity remain
+  consistent.
+- Aim for expected O(1), while recognizing linear worst-case behavior is
+  allowed. Retained IDs and expiration bookkeeping must stay bounded by
+  configured capacity, including under repeated duplicate refresh.
+
+### Repository, project, and design decisions
+
+- Work only in the active AgenticTDD worktree. Never write to the user's main
+  checkout and never access or modify the separate
+  TransactionDeduplicator learning repository.
+- Keep all coding-related artifacts under `pilot/coder`: the solution,
+  source, tests, benchmarks, reports, design, decision log, and coding skill.
+  The analyst handoff remains under `pilot/analyst`; refresh it from main
+  before coding when directed.
+- Build a C# console application and solution. Keep source and test projects
+  in separate directories. The approved target is `net10.0` based on SDK
+  10.0.400. Use XUnit and FluentAssertions if compatible.
+- Extract GUID parsing and configuration/parameter validation into separate
+  helpers; keep the core operation readable.
+- The constructor must not throw for invalid configuration or initialize
+  collections, locks, timers, or background workers. Validate on the
+  operation path; lazily create expensive state/resources after valid input.
+- The approved design prefers `ConcurrentDictionary` and a separate
+  background cleaner over a global lock. Compare it against a global-lock
+  baseline; this preference is not a measured performance claim. Preserve
+  exact expiry/capacity behavior and bounded state, and surface cleaner
+  failures instead of silently swallowing them.
+
+### Engineer approvals and TDD workflow
+
+- The design at `pilot/coder/TransactionDeduplicator-Design.txt` is approved.
+  Design approval is not a substitute for the approval gate after each TDD
+  commit.
+- For each criterion: add and run the RED test, commit it, and stop for
+  engineer approval; implement the minimum GREEN change, test and commit it,
+  and stop for approval; refactor while green, commit, and stop for approval.
+  Do not continue to the next stage or criterion without approval. This
+  overrides general guidance that a failing RED test need not be committed.
+- Keep a timestamped, append-only record of explicit engineer decisions in
+  `engineering-decisions.md`. Preserve history. When the original decision
+  time is unknown, record entry time with UTC offset and label it
+  retrospective.
+
+### Test style and benchmark requirements
+
+- Use a fake monotonic clock for deterministic expiry tests; do not sleep to
+  test boundaries. Cover parsing, configuration, first-seen and duplicate
+  behavior, refresh, exact-boundary expiry, capacity, invalid-input
+  no-mutation, bounded bookkeeping, concurrent calls/cleanup, instance
+  isolation, and cleaner disposal/failure visibility.
+- Keep tests minimal. Use a private readonly class-level system-under-test
+  property named `Sut` where appropriate. For a single act and assertion,
+  prefer an expression-bodied test with the method declaration on one line
+  and `=> Sut` on the next. Put each operation/assertion call on its own
+  following line indented one level further than `=> Sut`. Keep simple
+  FluentAssertions chains such as `.Should().BeTrue()` on one line. Do not
+  create an intermediate result variable or `Act()`/`Assert()` abstraction.
+- Benchmark global-lock and ConcurrentDictionary variants with multiple
+  threads. Start with small pilot runs and measure memory as well as
+  performance, then scale up.
+- Verify 100,000 total calls/second with 80% active duplicates and 20% new
+  IDs, using the default 10-second window and 1,000,000 capacity. The
+  expected steady-state population of new active IDs is about 200,000.
+- Produce a detailed report for every run under
+  `pilot/coder/benchmarks/reports/`, recording run/commit, variant, machine
+  and runtime, workload/configuration, worker count, warm-up and measurement
+  duration, offered/completed throughput, latency, failures/backlog, memory,
+  allocations, and GC data. Explicitly state whether the target was met; do
+  not claim success without measurements.
+
 ## Acceptance criteria versus API/design decisions
 
 Acceptance criteria state observable business/system behavior. Do not place
@@ -126,6 +236,20 @@ Keep tests deterministic with an injected fake monotonic clock; do not rely on
 sleeping for expiration-boundary tests. Cover capacity and concurrency races,
 including repeated duplicate refresh and cleanup. Preserve state-count
 invariants and avoid unbounded refresh bookkeeping.
+
+For a generic happy-path test that needs any valid GUID, pass
+`Guid.NewGuid().ToString()` rather than a fixed GUID literal. Use fixed GUID
+values only when a test specifically needs stable identity or formatting
+comparisons.
+
+Keep tests minimal and readable as the suite grows. When appropriate, expose
+the system under test as a private readonly class-level property named `Sut`.
+For a test with one act and one assertion, prefer an expression-bodied test
+with the method declaration followed by a line containing `=> Sut`, then
+each operation and chained FluentAssertions assertion on its own line,
+indented one level further than `=> Sut`. Keep simple assertions such as
+`.Should().BeTrue()` on one line. Do not add an intermediate result variable
+or extra Act/Assert helper abstraction.
 
 Before handing off, report completed test/build/benchmark commands, link the
 per-run reports, identify any unapproved decisions or unresolved risks, and

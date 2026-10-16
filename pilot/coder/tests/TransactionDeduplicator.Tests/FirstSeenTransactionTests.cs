@@ -5,13 +5,11 @@ namespace TransactionDeduplicator.Tests;
 
 public sealed class FirstSeenTransactionTests
 {
+    private readonly Deduplicator Sut = new();
+
     [Fact]
     public void First_valid_transaction_is_accepted()
-    {
-        var deduplicator = new Deduplicator();
-
-        var result = deduplicator.IsUniqueAndProcess("8b2f1f24-49bc-40fc-9c23-4c6a66c9a2f1");
-
-        result.Should().BeTrue();
-    }
+        => Sut
+            .IsUniqueAndProcess(Guid.NewGuid().ToString())
+            .Should().BeTrue();
 }

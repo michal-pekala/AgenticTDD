@@ -397,3 +397,103 @@ identified.
   items.
 - Affected work: `TransactionDeduplicator.sln` and engineering documentation.
 - Status: Active.
+
+### C-015 - Use generated GUIDs in generic happy-path tests
+
+- Recorded at: 2026-10-16T12:42:05+02:00
+- Decision time: Not captured (retrospective)
+- Context/question: A fixed GUID in a general first-seen test could be
+  mistaken for a special whitelisted value rather than an example of the
+  supported GUID domain.
+- Engineer decision: Use `Guid.NewGuid().ToString()` in generic happy-path
+  tests to make clear that any valid GUID serialized in the default format is
+  accepted. Use fixed GUIDs only when identity or formatting is the subject
+  of the test. Add this guidance to the coding skill.
+- Affected work: First-seen test data and `pilot/coder/SKILL.md`.
+- Status: Active
+
+### C-016 - Keep simple tests expression-bodied
+
+- Recorded at: 2026-10-16T12:52:51+02:00
+- Decision time: 2026-10-16T12:52:51+02:00
+- Context/question: Reduce boilerplate in the growing test suite without
+  hiding the act/assert behavior behind another abstraction.
+- Engineer decision: Keep the system under test as a private readonly
+  class-level property named `Sut`. For a test with one operation and one
+  assertion, use an expression-bodied test that directly chains the operation
+  into the assertion; do not use an intermediate result variable or add
+  `Act()`/`Assert()` helper methods.
+- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Status: Active
+
+### C-017 - Consolidate all engineer decisions in the coding skill
+
+- Recorded at: 2026-10-16T12:53:23+02:00
+- Decision time: 2026-10-16T12:53:23+02:00
+- Context/question: The coding skill summarized some decisions but did not
+  yet provide a single, self-contained checklist of the complete engineer
+  decision set.
+- Engineer decision: Include all applicable engineer decisions in
+  `pilot/coder/SKILL.md`, while retaining `engineering-decisions.md` as the
+  detailed, append-only history.
+- Affected work: `pilot/coder/SKILL.md` and future coding handoffs.
+- Status: Active
+
+### C-018 - Put expression-bodied test arrow on its own line
+
+- Recorded at: 2026-10-16T12:54:21+02:00
+- Decision time: 2026-10-16T12:54:21+02:00
+- Context/question: Make the act/assert chain easier to scan in concise
+  expression-bodied tests.
+- Engineer decision: Place `=>` on a separate line after the test method
+  declaration, then indent `Sut` and the operation/assertion chain beneath
+  it.
+- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Status: Active
+
+### C-019 - Align operation chain with Sut in expression-bodied tests
+
+- Recorded at: 2026-10-16T12:55:18+02:00
+- Decision time: 2026-10-16T12:55:18+02:00
+- Context/question: Clarify the exact whitespace/layout for the preferred
+  concise act/assert expression after reviewing the formatted example.
+- Engineer decision: Put the method declaration on its own line, `=> Sut` on
+  the next line, and each chained operation/assertion on its own subsequent
+  line aligned with `Sut`.
+- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Status: Active; clarifies C-018.
+
+### C-020 - Indent chained calls beneath expression-bodied Sut
+
+- Recorded at: 2026-10-16T12:55:40+02:00
+- Decision time: 2026-10-16T12:55:40+02:00
+- Context/question: Specify the exact indentation in the approved
+  expression-bodied test layout.
+- Engineer decision: The method declaration is followed by a line containing
+  `=> Sut`; each chained operation/assertion is on a following line indented
+  one level further than the `=> Sut` line.
+- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Status: Active; clarifies C-019.
+
+### C-021 - Keep simple FluentAssertions chains on one line
+
+- Recorded at: 2026-10-16T12:55:54+02:00
+- Decision time: 2026-10-16T12:55:54+02:00
+- Context/question: Avoid unnecessary line breaks in a short assertion
+  expression.
+- Engineer decision: Keep simple FluentAssertions chains, such as
+  `.Should().BeTrue()`, on one line.
+- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Status: Active
+
+### C-022 - Approve first RED stage and proceed to GREEN
+
+- Recorded at: 2026-10-16T12:56:52+02:00
+- Decision time: 2026-10-16T12:56:52+02:00
+- Context/question: The engineer reviewed the revised first-seen RED test and
+  requested that it be committed, then implemented to GREEN.
+- Engineer decision: Approve the first-seen RED stage, commit it, and proceed
+  with the criterion 1 GREEN implementation. Continue to require approval
+  after each subsequent TDD commit.
+- Affected work: Criterion 1 RED and GREEN stages; commit approval gate.
+- Status: Active
