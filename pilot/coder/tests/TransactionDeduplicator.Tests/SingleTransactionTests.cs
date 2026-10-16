@@ -12,4 +12,15 @@ public sealed class SingleTransactionTests
         => Sut
             .IsUniqueAndProcess(Guid.NewGuid().ToString())
             .Should().BeTrue();
+
+    [Fact]
+    public void Malformed_transaction_id_is_rejected()
+    {
+        var invalidId = $"not-a-guid-{Guid.NewGuid()}";
+
+        FluentActions
+            .Invoking(() => Sut.IsUniqueAndProcess(invalidId))
+            .Should().Throw<ArgumentException>()
+            .WithMessage($"TransactionId value '{invalidId}' is not a valid Guid.");
+    }
 }

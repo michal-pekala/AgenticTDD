@@ -584,3 +584,29 @@ identified.
   the `[REFACTOR]` commit.
 - Affected work: First-seen test class, coding skill, and REFACTOR commit.
 - Status: Active.
+
+### C-032 - Assert full invalid-ID message with generated input
+
+- Recorded at: 2026-10-16T14:41:48+02:00
+- Decision time: 2026-10-16T14:41:48+02:00
+- Context/question: A fixed invalid ID and partial message match would not
+  show that arbitrary non-GUID input is rejected with a useful diagnostic.
+- Engineer decision: Generate an invalid string value, use the same variable
+  in the operation and expected assertion, and assert the full message:
+  `TransactionId value '<invalidId>' is not a valid Guid.`
+- Affected work: Malformed-ID RED test and coding skill.
+- Status: Active.
+
+### C-033 - Randomize examples for generic input categories
+
+- Recorded at: 2026-10-16T14:44:35+02:00
+- Decision time: 2026-10-16T14:44:35+02:00
+- Context/question: A fixed value in a generic-behavior test can imply that
+  only that specific value is supported or rejected, rather than proving the
+  behavior for the broader input category.
+- Engineer decision: When testing generic behavior over an input category,
+  use a randomized representative from that category instead of a specific
+  constant. This applies to valid and invalid examples; use the same generated
+  value wherever the test needs to refer to it.
+- Affected work: Test data conventions and coding skill.
+- Status: Active.

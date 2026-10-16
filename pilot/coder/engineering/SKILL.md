@@ -149,6 +149,10 @@ to the coder log and update this section without deleting the history.
 - Name tests for the behavior they demonstrate, without claims the test does
   not verify (for example, use `New_transaction_can_be_processed` rather
   than implying sequence history or input validation).
+- When a test verifies behavior over a generic input category, use a
+  randomized value from that category instead of a specific constant that
+  might appear specially handled. For example, generate valid GUIDs for
+  generic happy paths and generated non-GUID strings for malformed-ID tests.
 - Group tests by scenario size: use `SingleTransactionTests` for single-ID
   behavior, then introduce clearly named test classes for multiple-ID
   scenarios as coverage grows.
