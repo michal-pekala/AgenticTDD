@@ -25,4 +25,13 @@ public sealed class SingleTransactionTests
             .Should().Throw<ArgumentException>()
             .WithMessage(Error.InvalidTransactionId.Format(invalidId));
     }
+
+    [Fact]
+    public void Active_transaction_duplicate_is_rejected()
+    {
+        var transactionId = Guid.NewGuid().ToString();
+
+        Sut.IsUniqueAndProcess(transactionId).Should().BeTrue();
+        Sut.IsUniqueAndProcess(transactionId).Should().BeFalse();
+    }
 }
