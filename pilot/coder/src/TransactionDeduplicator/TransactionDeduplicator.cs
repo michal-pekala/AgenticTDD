@@ -1,11 +1,15 @@
+using System.Collections.Concurrent;
+
 namespace TransactionDeduplicator.Pilot;
 
 public sealed class TransactionDeduplicator
 {
+    private readonly ConcurrentDictionary<Guid, byte> _transactions = new();
+
     public bool IsUniqueAndProcess(string transactionId)
     {
-        ParseTransactionId(transactionId);
-        return true;
+        var parsedTransactionId = ParseTransactionId(transactionId);
+        return _transactions.TryAdd(parsedTransactionId, 0);
     }
 
     private static Guid ParseTransactionId(string transactionId)

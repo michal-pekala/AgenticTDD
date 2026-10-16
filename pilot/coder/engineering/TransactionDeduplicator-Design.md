@@ -7,9 +7,12 @@ project-type revision in C-025. The class library and test projects are
 scaffolded. The new-transaction happy-path test has completed its RED, GREEN,
 and REFACTOR commits. The malformed-ID validation has completed RED, GREEN,
 and REFACTOR; its parser now returns the normalized GUID for subsequent
-identity handling. The active-duplicate behavior is now in RED; retained
-state and the approved concurrent design remain future tested stages. No
-benchmark project has been created yet.
+identity handling. Active-duplicate detection has completed RED and GREEN:
+GUIDs are registered in a concurrent dictionary, so repeats are rejected as
+duplicates. No REFACTOR commit was needed for this behavior; eager dictionary
+initialization is retained because its small allocation is acceptable.
+Expiration, capacity, and cleanup remain future tested stages. No benchmark
+project has been created yet.
 
 ## Approved acceptance basis
 

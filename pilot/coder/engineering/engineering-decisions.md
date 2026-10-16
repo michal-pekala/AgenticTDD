@@ -589,3 +589,18 @@ identified.
   focused on readable call sites.
 - Affected work: Validation error messages, tests, and coding skill.
 - Status: Active.
+
+### C-036 - Skip refactors without a demonstrated benefit
+
+- Recorded at: 2026-10-16T16:56:00+02:00
+- Decision time: 2026-10-16T16:56:00+02:00
+- Context/question: Lazy dictionary initialization added complexity and
+  offered no tested behavior or worthwhile benefit for the current stage.
+- Engineer decision: Retain simple eager dictionary initialization when its
+  small allocation is acceptable. Refactoring is optional; only make
+  behavior-preserving changes when a focused test or concrete readability or
+  maintenance concern demonstrates a worthwhile benefit. Skip redundant or
+  speculative refactors and do not create an empty REFACTOR commit.
+- Affected work: TDD commit workflow, design status, and future refactor
+  stages.
+- Status: Active.

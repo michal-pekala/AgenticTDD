@@ -109,14 +109,18 @@ to the coder log and update this section without deleting the history.
   solution folder together in that commit.
 - For each criterion: add and run the RED test, commit it, and stop for
   engineer approval; implement the minimum GREEN change, test and commit it,
-  and stop for approval; refactor while green, commit, and stop for approval.
-  Do not continue to the next stage or criterion without approval. This
-  overrides general guidance that a failing RED test need not be committed.
+  and stop for approval. Refactoring is optional: do it only when a focused
+  test or concrete readability/maintenance concern demonstrates a worthwhile
+  improvement. Do not add speculative or redundant changes merely to create a
+  REFACTOR commit. If there is no worthwhile refactor, record that it was
+  skipped and proceed without a REFACTOR commit. Obtain engineer approval
+  after every commit before continuing. This overrides general guidance that
+  a failing RED test need not be committed.
 - Name each TDD commit with the same concise, behavior-focused test name and
   its stage suffix, in this format:
-  `<short behavior name> [RED]`, `<short behavior name> [GREEN]`, and
-  `<short behavior name> [REFACTOR]`. Keep commit subjects consistent across
-  all three stages for a criterion.
+  `<short behavior name> [RED]`, `<short behavior name> [GREEN]`, and, when a
+  worthwhile refactor is made, `<short behavior name> [REFACTOR]`. Keep
+  subjects consistent across the commits that are made for a criterion.
 - Include each engineering-document or decision-log change in the RED, GREEN,
   or REFACTOR commit it explains when that change is directly related to that
   stage's code or test. Keep unrelated documentation changes out of TDD
@@ -124,9 +128,10 @@ to the coder log and update this section without deleting the history.
 - Keep each TDD commit focused on its matching stage: RED contains the
   failing test and its relevant guidance; GREEN contains the smallest passing
   implementation plus any test-name change and directly related guidance;
-  REFACTOR contains behavior-preserving cleanup and its related design or
-  decision updates. Preserve the RED -> GREEN -> REFACTOR order and the
-  engineer approval gate after every commit.
+  when justified, REFACTOR contains behavior-preserving cleanup and its
+  related design or decision updates. Preserve the RED -> GREEN order and,
+  when worthwhile, the REFACTOR step; the engineer approval gate applies
+  after every commit.
 - Keep a timestamped, append-only record of explicit engineer decisions in
   `engineering-decisions.md`. Preserve history. When the original decision
   time is unknown, record entry time with UTC offset and label it
