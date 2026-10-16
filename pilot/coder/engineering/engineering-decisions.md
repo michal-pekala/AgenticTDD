@@ -555,6 +555,22 @@ identified.
   `Program.cs`.
 - Status: Active; supersedes the console-app portion of C-001.
 
+### C-030 - Co-locate TDD documentation with its implementation stage
+
+- Recorded at: 2026-10-16T14:19:27+02:00
+- Decision time: 2026-10-16T14:19:27+02:00
+- Context/question: Keep engineering guidance and design/decision history
+  reviewable alongside the source and test changes they explain.
+- Engineer decision: For future criteria, use one behavior-focused test name
+  across the RED, GREEN, and REFACTOR commit subjects, suffixed with the
+  corresponding stage label. Include engineering-document and decision-log
+  updates in the matching TDD-stage commit when directly related to that
+  stage; keep unrelated documentation changes out of TDD commits. The setup
+  commit remains `Add engineering metadata`. Preserve the RED -> GREEN ->
+  REFACTOR sequence and engineer approval gate after every commit.
+- Affected work: Coding skill, decision log, and subsequent TDD commits.
+- Status: Active.
+
 ### C-031 - Name test classes by transaction scenario size
 
 - Recorded at: 2026-10-16T14:30:19+02:00

@@ -104,11 +104,29 @@ to the coder log and update this section without deleting the history.
   `pilot/coder/engineering/TransactionDeduplicator-Design.md` is approved.
   Design approval is not a substitute for the approval gate after each TDD
   commit.
+- The pilot setup commit is `Add engineering metadata`; initialize the coding
+  skill, engineering decision log, design, and Visual Studio `engineering`
+  solution folder together in that commit.
 - For each criterion: add and run the RED test, commit it, and stop for
   engineer approval; implement the minimum GREEN change, test and commit it,
   and stop for approval; refactor while green, commit, and stop for approval.
   Do not continue to the next stage or criterion without approval. This
   overrides general guidance that a failing RED test need not be committed.
+- Name each TDD commit with the same concise, behavior-focused test name and
+  its stage suffix, in this format:
+  `<short behavior name> [RED]`, `<short behavior name> [GREEN]`, and
+  `<short behavior name> [REFACTOR]`. Keep commit subjects consistent across
+  all three stages for a criterion.
+- Include each engineering-document or decision-log change in the RED, GREEN,
+  or REFACTOR commit it explains when that change is directly related to that
+  stage's code or test. Keep unrelated documentation changes out of TDD
+  commits; put initial engineering metadata in the setup commit instead.
+- Keep each TDD commit focused on its matching stage: RED contains the
+  failing test and its relevant guidance; GREEN contains the smallest passing
+  implementation plus any test-name change and directly related guidance;
+  REFACTOR contains behavior-preserving cleanup and its related design or
+  decision updates. Preserve the RED -> GREEN -> REFACTOR order and the
+  engineer approval gate after every commit.
 - Keep a timestamped, append-only record of explicit engineer decisions in
   `engineering-decisions.md`. Preserve history. When the original decision
   time is unknown, record entry time with UTC offset and label it
@@ -130,12 +148,10 @@ to the coder log and update this section without deleting the history.
   create an intermediate result variable or `Act()`/`Assert()` abstraction.
 - Name tests for the behavior they demonstrate, without claims the test does
   not verify (for example, use `New_transaction_can_be_processed` rather
-  than implying sequence history or input validation). Use the same short
+  than implying sequence history or input validation).
 - Group tests by scenario size: use `SingleTransactionTests` for single-ID
   behavior, then introduce clearly named test classes for multiple-ID
-  scenarios as coverage grows. Use the same short
-  behavior name for each TDD commit, followed by `[RED]`, `[GREEN]`, or
-  `[REFACTOR]`.
+  scenarios as coverage grows.
 - Benchmark global-lock and ConcurrentDictionary variants with multiple
   threads. Start with small pilot runs and measure memory as well as
   performance, then scale up.
