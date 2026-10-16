@@ -4,16 +4,18 @@ public sealed class TransactionDeduplicator
 {
     public bool IsUniqueAndProcess(string transactionId)
     {
-        ValidateTransactionId(transactionId);
+        ParseTransactionId(transactionId);
         return true;
     }
 
-    private static void ValidateTransactionId(string transactionId)
+    private static Guid ParseTransactionId(string transactionId)
     {
-        if (!Guid.TryParse(transactionId, out _))
+        if (!Guid.TryParse(transactionId, out var parsedTransactionId))
         {
             throw new ArgumentException(
-                $"TransactionId value '{transactionId}' is not a valid Guid.");
+                ValidationError.InvalidTransactionId.Format(transactionId));
         }
+
+        return parsedTransactionId;
     }
 }

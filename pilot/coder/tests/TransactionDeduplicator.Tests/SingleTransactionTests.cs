@@ -1,5 +1,7 @@
 using FluentAssertions;
+using TransactionDeduplicator.Pilot;
 using Deduplicator = TransactionDeduplicator.Pilot.TransactionDeduplicator;
+using Error = TransactionDeduplicator.Pilot.ValidationError;
 
 namespace TransactionDeduplicator.Tests;
 
@@ -21,6 +23,6 @@ public sealed class SingleTransactionTests
         FluentActions
             .Invoking(() => Sut.IsUniqueAndProcess(invalidId))
             .Should().Throw<ArgumentException>()
-            .WithMessage($"TransactionId value '{invalidId}' is not a valid Guid.");
+            .WithMessage(Error.InvalidTransactionId.Format(invalidId));
     }
 }

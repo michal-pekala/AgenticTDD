@@ -351,18 +351,6 @@ identified.
 - Affected work: All repository file operations.
 - Status: Active
 
-### C-014 - Approve the revised design
-
-- Recorded at: 2026-10-15T17:03:20+02:00
-- Decision time: 2026-10-15T17:03:20+02:00
-- Context/question: Approval request for the revised solution design and the
-  separation of D-002 from business acceptance criterion 6.
-- Engineer decision: Approve the revised design. Proceed with implementation
-  only through the separately specified TDD stages and engineer approval
-  after each commit.
-- Affected work: Design approval gate; implementation start.
-- Status: Active
-
 ### C-026 - Group coder guidance and design artifacts
 
 - Recorded at: 2026-10-16T13:15:19+02:00
@@ -487,18 +475,6 @@ identified.
 - Affected work: First-seen test and `pilot/coder/engineering/SKILL.md`.
 - Status: Active
 
-### C-022 - Approve first RED stage and proceed to GREEN
-
-- Recorded at: 2026-10-16T12:56:52+02:00
-- Decision time: 2026-10-16T12:56:52+02:00
-- Context/question: The engineer reviewed the revised first-seen RED test and
-  requested that it be committed, then implemented to GREEN.
-- Engineer decision: Approve the first-seen RED stage, commit it, and proceed
-  with the criterion 1 GREEN implementation. Continue to require approval
-  after each subsequent TDD commit.
-- Affected work: Criterion 1 RED and GREEN stages; commit approval gate.
-- Status: Active
-
 ### C-023 - Keep the first-seen GREEN change minimal
 
 - Recorded at: 2026-10-16T13:03:14+02:00
@@ -524,20 +500,6 @@ identified.
   subject. Include the method rename in the GREEN commit.
 - Affected work: First-seen test, TDD commit history, and coding skill.
 - Status: Active.
-
-### C-024 - Approve final first-seen GREEN commit
-
-- Recorded at: 2026-10-16T13:04:22+02:00
-- Decision time: 2026-10-16T13:04:22+02:00
-- Context/question: Review of the rewritten final GREEN commit for the focused
-  first-seen test.
-- Engineer decision: Approve the final first-seen GREEN change and proceed
-  to the refactor stage. The commit was subsequently rewritten as
-  `fd95af7` to include the approved test-name and engineering-guidance
-  changes. ID storage and remaining behavior will be addressed by later
-  focused tests/stages.
-- Affected work: Criterion 1 TDD sequence.
-- Status: Active
 
 ### C-025 - Use a class library instead of a console application
 
@@ -611,16 +573,19 @@ identified.
 - Affected work: Test data conventions and coding skill.
 - Status: Active.
 
-### C-034 - Approve malformed-ID GREEN stage
+### C-035 - Reuse source error templates in test assertions
 
-- Recorded at: 2026-10-16T15:53:29+02:00
-- Decision time: 2026-10-16T15:53:29+02:00
-- Context/question: The malformed-ID RED test verifies that a generated
-  non-GUID string is rejected with its exact expected message.
-- Engineer decision: Approve the RED test and proceed with GREEN: validate
-  transaction ID GUID format, throw `ArgumentException` with
-  `TransactionId value '<value>' is not a valid Guid.`, and preserve the
-  valid-ID happy path.
-- Affected work: Malformed-ID implementation, design status, and GREEN
-  commit.
+- Recorded at: 2026-10-16T16:08:16+02:00
+- Decision time: 2026-10-16T16:08:08+02:00
+- Context/question: The malformed-ID test duplicated the error-message text
+  that the implementation emitted, and direct formatting required an
+  unreadable call with unrelated parameters.
+- Engineer decision: Define reusable error-message templates in a separate
+  `ValidationError` class and reference the source constant in test
+  assertions instead of duplicating the text. Format templates through a
+  `StringExtensions.Format` extension to keep call sites concise and use
+  invariant culture. More generally, replace unreadable constructions with
+  unrelated parameters with small, meaningfully named extension methods
+  focused on readable call sites.
+- Affected work: Validation error messages, tests, and coding skill.
 - Status: Active.

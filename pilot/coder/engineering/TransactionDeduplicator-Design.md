@@ -5,8 +5,9 @@
 Engineer-approved design (approved 2026-10-15T17:03:20+02:00), with the
 project-type revision in C-025. The class library and test projects are
 scaffolded. The new-transaction happy-path test has completed its RED, GREEN,
-and REFACTOR commits. A malformed-ID test is now in the GREEN stage; this
-stage adds GUID validation and its specified `ArgumentException` message.
+and REFACTOR commits. The malformed-ID validation has completed RED, GREEN,
+and REFACTOR; its parser now returns the normalized GUID for subsequent
+identity handling.
 State storage, duplicate handling, and the approved concurrent design remain
 future tested stages. No benchmark project has been created yet.
 
@@ -87,7 +88,10 @@ the design and decision log, remain under `pilot/coder`.
   throws a clear `ArgumentOutOfRangeException` there. Parse using
   `Guid.TryParse`, returning a normalized `Guid`. Null, empty,
   whitespace-only, or malformed input throws `ArgumentException`. No state,
-  clock, or cleaner is touched for invalid IDs. `Guid.Empty` is valid.
+  clock, or cleaner is touched for invalid IDs. The malformed-GUID error text
+  comes from the shared `ValidationError` template constant, reused in tests
+  and formatted with `StringExtensions.Format` so the message is not
+  duplicated. `Guid.Empty` is valid.
 - D-002 requires the capacity case to use a dedicated
   `CapacityExceededException`, not `OutOfMemoryException`. This is an
   API/design decision, not criterion 6. Confirm the exception's inheritance
