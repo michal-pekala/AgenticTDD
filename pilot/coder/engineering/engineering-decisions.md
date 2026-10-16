@@ -201,7 +201,8 @@ into this log.
   a solution file, and place source and test projects in separate
   directories.
 - Affected work: `pilot/coder` solution and project layout.
-- Status: Active
+- Status: Superseded in part by C-025; the solution and separate-directory
+  requirements remain active.
 
 ### C-002 - Separate validation and parsing helpers
 
@@ -409,7 +410,7 @@ identified.
   tests to make clear that any valid GUID serialized in the default format is
   accepted. Use fixed GUIDs only when identity or formatting is the subject
   of the test. Add this guidance to the coding skill.
-- Affected work: First-seen test data and `pilot/coder/SKILL.md`.
+- Affected work: First-seen test data and `pilot/coder/engineering/SKILL.md`.
 - Status: Active
 
 ### C-016 - Keep simple tests expression-bodied
@@ -423,7 +424,7 @@ identified.
   assertion, use an expression-bodied test that directly chains the operation
   into the assertion; do not use an intermediate result variable or add
   `Act()`/`Assert()` helper methods.
-- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Affected work: First-seen test and `pilot/coder/engineering/SKILL.md`.
 - Status: Active
 
 ### C-017 - Consolidate all engineer decisions in the coding skill
@@ -434,9 +435,9 @@ identified.
   yet provide a single, self-contained checklist of the complete engineer
   decision set.
 - Engineer decision: Include all applicable engineer decisions in
-  `pilot/coder/SKILL.md`, while retaining `engineering-decisions.md` as the
+  `pilot/coder/engineering/SKILL.md`, while retaining `engineering-decisions.md` as the
   detailed, append-only history.
-- Affected work: `pilot/coder/SKILL.md` and future coding handoffs.
+- Affected work: `pilot/coder/engineering/SKILL.md` and future coding handoffs.
 - Status: Active
 
 ### C-018 - Put expression-bodied test arrow on its own line
@@ -448,7 +449,7 @@ identified.
 - Engineer decision: Place `=>` on a separate line after the test method
   declaration, then indent `Sut` and the operation/assertion chain beneath
   it.
-- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Affected work: First-seen test and `pilot/coder/engineering/SKILL.md`.
 - Status: Active
 
 ### C-019 - Align operation chain with Sut in expression-bodied tests
@@ -460,7 +461,7 @@ identified.
 - Engineer decision: Put the method declaration on its own line, `=> Sut` on
   the next line, and each chained operation/assertion on its own subsequent
   line aligned with `Sut`.
-- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Affected work: First-seen test and `pilot/coder/engineering/SKILL.md`.
 - Status: Active; clarifies C-018.
 
 ### C-020 - Indent chained calls beneath expression-bodied Sut
@@ -472,7 +473,7 @@ identified.
 - Engineer decision: The method declaration is followed by a line containing
   `=> Sut`; each chained operation/assertion is on a following line indented
   one level further than the `=> Sut` line.
-- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Affected work: First-seen test and `pilot/coder/engineering/SKILL.md`.
 - Status: Active; clarifies C-019.
 
 ### C-021 - Keep simple FluentAssertions chains on one line
@@ -483,7 +484,7 @@ identified.
   expression.
 - Engineer decision: Keep simple FluentAssertions chains, such as
   `.Should().BeTrue()`, on one line.
-- Affected work: First-seen test and `pilot/coder/SKILL.md`.
+- Affected work: First-seen test and `pilot/coder/engineering/SKILL.md`.
 - Status: Active
 
 ### C-022 - Approve first RED stage and proceed to GREEN
@@ -522,4 +523,48 @@ identified.
   by `[RED]`, `[GREEN]`, or `[REFACTOR]` for each corresponding TDD commit
   subject. Include the method rename in the GREEN commit.
 - Affected work: First-seen test, TDD commit history, and coding skill.
+- Status: Active.
+
+### C-024 - Approve final first-seen GREEN commit
+
+- Recorded at: 2026-10-16T13:04:22+02:00
+- Decision time: 2026-10-16T13:04:22+02:00
+- Context/question: Review of the rewritten final GREEN commit for the focused
+  first-seen test.
+- Engineer decision: Approve the final first-seen GREEN change and proceed
+  to the refactor stage. The commit was subsequently rewritten as
+  `fd95af7` to include the approved test-name and engineering-guidance
+  changes. ID storage and remaining behavior will be addressed by later
+  focused tests/stages.
+- Affected work: Criterion 1 TDD sequence.
+- Status: Active
+
+### C-025 - Use a class library instead of a console application
+
+- Recorded at: 2026-10-16T13:07:11+02:00
+- Decision time: 2026-10-16T13:07:11+02:00
+- Context/question: The scaffolded `Program.cs` contained only the template's
+  Hello World entry point and was unrelated to the component tests. Removing
+  it from an executable project would leave the project without an entry
+  point.
+- Engineer decision: Remove the console-app requirement and use a C# class
+  library for the deduplicator, retaining a separate test project and
+  solution. This supersedes C-001's console-application requirement; keep
+  C-001's requirement for a solution and separate source/test directories.
+- Affected work: Project type/layout, solution, project references, and
+  `Program.cs`.
+- Status: Active; supersedes the console-app portion of C-001.
+
+### C-031 - Name test classes by transaction scenario size
+
+- Recorded at: 2026-10-16T14:30:19+02:00
+- Decision time: 2026-10-16T14:30:19+02:00
+- Context/question: Start test coverage with simple single-transaction
+  scenarios before expanding to cases involving multiple transactions.
+- Engineer decision: Rename `FirstSeenTransactionTests` to
+  `SingleTransactionTests`; use a single-transaction test class for this
+  initial scenario and introduce clearly named multiple-transaction test
+  classes as those scenarios are added. Include the rename and guidance in
+  the `[REFACTOR]` commit.
+- Affected work: First-seen test class, coding skill, and REFACTOR commit.
 - Status: Active.

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionDeduplicator.Console", "src\TransactionDeduplicator.Console\TransactionDeduplicator.Console.csproj", "{2C63CBE8-EEF9-43E1-BE03-41489C9EF6A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionDeduplicator", "src\TransactionDeduplicator\TransactionDeduplicator.csproj", "{2C63CBE8-EEF9-43E1-BE03-41489C9EF6A9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject

@@ -31,9 +31,9 @@ Studio under the `engineering` solution folder.
 ## Consolidated engineer decisions
 
 This section consolidates the active decisions in
-`pilot/coder/engineering-decisions.md` and the approved behavior decisions
-D-001 through D-013 in `pilot/analyst/behaviour-decisions.md`. The decision
-logs remain the detailed historical record; this skill is the coding
+`pilot/coder/engineering/engineering-decisions.md` and the approved behavior
+decisions D-001 through D-013 in `pilot/analyst/behaviour-decisions.md`. The
+decision logs remain the detailed historical record; this skill is the coding
 checklist. If a newer decision changes one of these instructions, append it
 to the coder log and update this section without deleting the history.
 
@@ -82,9 +82,11 @@ to the coder log and update this section without deleting the history.
   source, tests, benchmarks, reports, design, decision log, and coding skill.
   The analyst handoff remains under `pilot/analyst`; refresh it from main
   before coding when directed.
-- Build a C# console application and solution. Keep source and test projects
-  in separate directories. The approved target is `net10.0` based on SDK
-  10.0.400. Use XUnit and FluentAssertions if compatible.
+- Build a C# class library and solution; a console host is not required. This
+  supersedes C-001's original console-application choice while retaining its
+  solution and separate source/test-project requirements. The approved target
+  is `net10.0` based on SDK 10.0.400. Use XUnit and FluentAssertions if
+  compatible.
 - Extract GUID parsing and configuration/parameter validation into separate
   helpers; keep the core operation readable.
 - The constructor must not throw for invalid configuration or initialize
@@ -98,7 +100,8 @@ to the coder log and update this section without deleting the history.
 
 ### Engineer approvals and TDD workflow
 
-- The design at `pilot/coder/TransactionDeduplicator-Design.txt` is approved.
+- The design at
+  `pilot/coder/engineering/TransactionDeduplicator-Design.md` is approved.
   Design approval is not a substitute for the approval gate after each TDD
   commit.
 - For each criterion: add and run the RED test, commit it, and stop for
@@ -128,6 +131,9 @@ to the coder log and update this section without deleting the history.
 - Name tests for the behavior they demonstrate, without claims the test does
   not verify (for example, use `New_transaction_can_be_processed` rather
   than implying sequence history or input validation). Use the same short
+- Group tests by scenario size: use `SingleTransactionTests` for single-ID
+  behavior, then introduce clearly named test classes for multiple-ID
+  scenarios as coverage grows. Use the same short
   behavior name for each TDD commit, followed by `[RED]`, `[GREEN]`, or
   `[REFACTOR]`.
 - Benchmark global-lock and ConcurrentDictionary variants with multiple
@@ -170,8 +176,9 @@ or performance success without evidence.
 
 ## Project and API decisions
 
-- Build a C# console application and solution. Keep source and test projects
-  in separate directories under `pilot/coder`.
+- Build a C# class library and solution, with source and test projects in
+  separate directories under `pilot/coder`; a console application is not
+  required (C-025 supersedes the console-app part of C-001).
 - The installed .NET SDK is 10.0.400; the engineer-approved target is
   `net10.0`.
 - Use XUnit and FluentAssertions if compatible with the selected package

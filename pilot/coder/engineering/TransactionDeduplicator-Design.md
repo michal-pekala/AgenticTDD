@@ -2,12 +2,14 @@
 
 ## Status
 
-Engineer-approved design (approved 2026-10-15T17:03:20+02:00). The console
-and test projects are scaffolded. Criterion 1 has a committed RED test.
+Engineer-approved design (approved 2026-10-15T17:03:20+02:00), with the
+project-type revision in C-025. The class library and test projects are
+scaffolded. Criterion 1 has a committed RED test and GREEN implementation.
+The updated refactor commit is ready for engineer review.
 Its GREEN step is intentionally limited to the smallest implementation that
 passes the focused return-value test; identity storage, parsing, and the
-approved concurrent design remain future tested stages. No refactor or
-benchmark project has been created yet.
+approved concurrent design remain future tested stages. No benchmark project
+has been created yet.
 
 ## Approved acceptance basis
 
@@ -50,23 +52,23 @@ approval.
 ## Project layout and framework proposal
 
 The repository's current `origin/main` has no C# solution or existing
-project/test/benchmark conventions. The installed SDK is 10.0.400. Proposed
-layout:
+project/test/benchmark conventions. The installed SDK is 10.0.400. The
+engineer superseded the initial console-app decision (C-001) and approved a
+class library with a separate test project. Layout:
 
 ```text
 pilot/coder/TransactionDeduplicator.sln
-pilot/coder/src/TransactionDeduplicator.Console/
+pilot/coder/src/TransactionDeduplicator/
 pilot/coder/tests/TransactionDeduplicator.Tests/
 pilot/coder/benchmarks/TransactionDeduplicator.Benchmarks/
 pilot/coder/benchmarks/reports/
 ```
 
-Target `net10.0`. The console project contains the public deduplicator
-component and a minimal runnable demonstration; the separate test project
-references it. Use XUnit and FluentAssertions, consistent with the README
-preference, subject to package compatibility during scaffolding. All
-coding-related artifacts, including the design and decision log, remain
-under `pilot/coder`.
+Target `net10.0`. The library contains the public deduplicator component;
+the separate test project references it. A console host is not required.
+Use XUnit and FluentAssertions, consistent with the README preference,
+subject to package compatibility. All coding-related artifacts, including
+the design and decision log, remain under `pilot/coder`.
 
 ## Public API and execution-path validation proposal
 
@@ -142,7 +144,7 @@ The design stores no refresh-history queue or stale heap records. Each
 retained ID has one map entry; therefore expiry bookkeeping is bounded by the
 same configured entry capacity. If the cleaner or map is unavailable, surface
 the failure on the execution/disposal path rather than silently ignoring it.
-The console host owns and disposes the cleaner; provide deterministic
+A containing host owns and disposes the cleaner; provide deterministic
 disposal so a DI container can stop it. State remains process-local and
 instance-local.
 

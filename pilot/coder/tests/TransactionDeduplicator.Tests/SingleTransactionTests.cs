@@ -3,9 +3,9 @@ using Deduplicator = TransactionDeduplicator.Pilot.TransactionDeduplicator;
 
 namespace TransactionDeduplicator.Tests;
 
-public sealed class FirstSeenTransactionTests
+public sealed class SingleTransactionTests
 {
-    private readonly Deduplicator Sut = new();
+    private Deduplicator Sut { get; } = new();
 
     [Fact]
     public void New_transaction_can_be_processed()
