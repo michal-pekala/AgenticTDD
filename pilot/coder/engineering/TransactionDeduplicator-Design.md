@@ -3,9 +3,11 @@
 ## Status
 
 Engineer-approved design (approved 2026-10-15T17:03:20+02:00). The console
-and test projects are scaffolded. The first-seen test is in the RED stage and
-fails on the behavior assertion; no GREEN implementation or benchmark project
-has been created yet.
+and test projects are scaffolded. Criterion 1 has a committed RED test.
+Its GREEN step is intentionally limited to the smallest implementation that
+passes the focused return-value test; identity storage, parsing, and the
+approved concurrent design remain future tested stages. No refactor or
+benchmark project has been created yet.
 
 ## Approved acceptance basis
 

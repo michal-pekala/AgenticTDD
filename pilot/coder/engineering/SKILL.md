@@ -125,6 +125,11 @@ to the coder log and update this section without deleting the history.
   following line indented one level further than `=> Sut`. Keep simple
   FluentAssertions chains such as `.Should().BeTrue()` on one line. Do not
   create an intermediate result variable or `Act()`/`Assert()` abstraction.
+- Name tests for the behavior they demonstrate, without claims the test does
+  not verify (for example, use `New_transaction_can_be_processed` rather
+  than implying sequence history or input validation). Use the same short
+  behavior name for each TDD commit, followed by `[RED]`, `[GREEN]`, or
+  `[REFACTOR]`.
 - Benchmark global-lock and ConcurrentDictionary variants with multiple
   threads. Start with small pilot runs and measure memory as well as
   performance, then scale up.

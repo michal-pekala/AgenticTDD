@@ -8,7 +8,7 @@ public sealed class FirstSeenTransactionTests
     private readonly Deduplicator Sut = new();
 
     [Fact]
-    public void First_valid_transaction_is_accepted()
+    public void New_transaction_can_be_processed()
         => Sut
             .IsUniqueAndProcess(Guid.NewGuid().ToString())
             .Should().BeTrue();

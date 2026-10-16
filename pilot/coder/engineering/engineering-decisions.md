@@ -497,3 +497,29 @@ identified.
   after each subsequent TDD commit.
 - Affected work: Criterion 1 RED and GREEN stages; commit approval gate.
 - Status: Active
+
+### C-023 - Keep the first-seen GREEN change minimal
+
+- Recorded at: 2026-10-16T13:03:14+02:00
+- Decision time: 2026-10-16T13:03:14+02:00
+- Context/question: The first-seen RED test only asserts that processing a
+  valid GUID returns true. The initial GREEN implementation added GUID
+  parsing and a ConcurrentDictionary before tests exercised those behaviors.
+- Engineer decision: For this focused GREEN step, make the simplest
+  one-line change that passes the test. Defer parsing and state storage until
+  focused tests require them in subsequent criteria.
+- Affected work: Criterion 1 GREEN implementation and following RED stages.
+- Status: Active
+
+### C-027 - Use behavioral test names and TDD commit subjects
+
+- Recorded at: 2026-10-16T13:36:18+02:00
+- Decision time: 2026-10-16T13:36:18+02:00
+- Context/question: `First_valid_transaction_is_accepted` implied sequence
+  history and input validation that the test does not demonstrate.
+- Engineer decision: Rename the method to
+  `New_transaction_can_be_processed`. Use the concise behavior name followed
+  by `[RED]`, `[GREEN]`, or `[REFACTOR]` for each corresponding TDD commit
+  subject. Include the method rename in the GREEN commit.
+- Affected work: First-seen test, TDD commit history, and coding skill.
+- Status: Active.
