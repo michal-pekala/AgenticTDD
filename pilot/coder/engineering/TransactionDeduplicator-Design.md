@@ -4,12 +4,11 @@
 
 Engineer-approved design (approved 2026-10-15T17:03:20+02:00), with the
 project-type revision in C-025. The class library and test projects are
-scaffolded. Criterion 1 has a committed RED test and GREEN implementation.
-The updated refactor commit is ready for engineer review.
-Its GREEN step is intentionally limited to the smallest implementation that
-passes the focused return-value test; identity storage, parsing, and the
-approved concurrent design remain future tested stages. No benchmark project
-has been created yet.
+scaffolded. The new-transaction happy-path test has completed its RED, GREEN,
+and REFACTOR commits. A malformed-ID test is now in the GREEN stage; this
+stage adds GUID validation and its specified `ArgumentException` message.
+State storage, duplicate handling, and the approved concurrent design remain
+future tested stages. No benchmark project has been created yet.
 
 ## Approved acceptance basis
 

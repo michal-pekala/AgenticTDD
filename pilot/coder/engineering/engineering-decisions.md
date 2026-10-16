@@ -610,3 +610,17 @@ identified.
   value wherever the test needs to refer to it.
 - Affected work: Test data conventions and coding skill.
 - Status: Active.
+
+### C-034 - Approve malformed-ID GREEN stage
+
+- Recorded at: 2026-10-16T15:53:29+02:00
+- Decision time: 2026-10-16T15:53:29+02:00
+- Context/question: The malformed-ID RED test verifies that a generated
+  non-GUID string is rejected with its exact expected message.
+- Engineer decision: Approve the RED test and proceed with GREEN: validate
+  transaction ID GUID format, throw `ArgumentException` with
+  `TransactionId value '<value>' is not a valid Guid.`, and preserve the
+  valid-ID happy path.
+- Affected work: Malformed-ID implementation, design status, and GREEN
+  commit.
+- Status: Active.
