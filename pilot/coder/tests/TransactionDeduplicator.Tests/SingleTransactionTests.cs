@@ -121,6 +121,24 @@ public sealed class SingleTransactionTests
             Error.InvalidUniqnessBufferCapacity.Format(_options.UniqnessBufferCapacity));
     }
 
+    [Fact]
+    public void New_transaction_is_rejected_when_capacity_is_full()
+    {
+        _options.UniqnessBufferCapacity = 1;
+        var activeTransactionId = Guid.NewGuid().ToString();
+        var newTransactionId = Guid.NewGuid().ToString();
+
+        Sut.IsUniqueAndProcess(activeTransactionId)
+            .Should().BeTrue();
+
+        FluentActions
+            .Invoking(() => Sut.IsUniqueAndProcess(newTransactionId))
+            .Should().Throw<Exception>();
+
+        Sut.IsUniqueAndProcess(activeTransactionId)
+            .Should().BeFalse();
+    }
+
     private void AssertInvalidOptionIsRejected(string expectedErrorMessage)
         => FluentActions
             .Invoking(() => Sut.IsUniqueAndProcess(Guid.NewGuid().ToString()))
