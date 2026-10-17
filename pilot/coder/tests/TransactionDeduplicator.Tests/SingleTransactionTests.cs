@@ -67,6 +67,26 @@ public sealed class SingleTransactionTests
     }
 
     [Fact]
+    public void Duplicate_attempt_refreshes_expiration()
+    {
+        _options.UniqnessCheckExpiration = Random.Shared.Next(2, 30).Seconds();
+        var transactionId = Guid.NewGuid().ToString();
+
+        Sut.IsUniqueAndProcess(transactionId)
+            .Should().BeTrue();
+
+        Now += _options.UniqnessCheckExpiration / 2;
+
+        Sut.IsUniqueAndProcess(transactionId)
+            .Should().BeFalse();
+
+        Now += _options.UniqnessCheckExpiration - 1.Milliseconds();
+
+        Sut.IsUniqueAndProcess(transactionId)
+            .Should().BeFalse();
+    }
+
+    [Fact]
     public void Expired_transaction_can_be_processed_again()
     {
         _options.UniqnessCheckExpiration = Random.Shared.Next(2, 30).Seconds();

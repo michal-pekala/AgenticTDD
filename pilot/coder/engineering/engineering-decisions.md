@@ -676,8 +676,7 @@ identified.
   requirement to refresh expiration; that requirement is out of the current
   implementation scope until explicitly restored with a focused test.
 - Affected work: Duplicate expiration semantics, skill, and design.
-- Status: Active; supersedes D-001 and the handoff's duplicate-refresh
-  requirement for current scope.
+- Status: Superseded by C-044.
 
 ### C-042 - Implement designed behavior only when required by tests
 
@@ -707,4 +706,20 @@ identified.
   `Fixture` directory and prefer existing ecosystem extensions, such as
   FluentAssertions' `Seconds()` and `Milliseconds()`, over local duplicates.
 - Affected work: Test project organization, test helpers, and coding skill.
+- Status: Active.
+
+### C-044 - Add a focused duplicate-expiry-refresh test
+
+- Recorded at: 2026-10-17T19:41:15+02:00
+- Decision time: 2026-10-17T19:41:03+02:00
+- Context/question: The current tests do not yet demonstrate that a duplicate
+  attempt refreshes the expiration window.
+- Engineer decision: Add a focused test with a randomized configured
+  expiration: accept an ID, advance partway through its window, verify a
+  duplicate returns `false`, then advance to just before the duplicate-
+  refreshed boundary and verify it remains a duplicate. This restores the
+  analyst handoff and D-001 refresh behavior as an explicit test-driven
+  requirement, superseding C-041's temporary deferral.
+- Affected work: Duplicate-refresh test, expiration behavior, and coding
+  guidance.
 - Status: Active.

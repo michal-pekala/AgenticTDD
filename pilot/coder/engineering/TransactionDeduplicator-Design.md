@@ -10,10 +10,10 @@ and REFACTOR; its parser now returns the normalized GUID for subsequent
 identity handling. Active-duplicate detection has completed RED and GREEN:
 GUIDs are registered in a concurrent dictionary, so repeats are rejected as
 duplicates. Configurable expiration and exact-boundary behavior are
-implemented using the injected `IDateTimeProvider`. Per C-041, active
-duplicates do not refresh expiration; this supersedes the original analyst
-handoff and D-001 behavior. Expiry handling uses direct dictionary lookup;
-synchronization is explicitly deferred as requested and remains an
+implemented using the injected `IDateTimeProvider`. Duplicate expiration
+refresh is now in RED per C-044; the prior decision to defer refresh pending
+a focused test (C-041) is superseded. Expiry handling uses direct dictionary
+lookup; synchronization is explicitly deferred as requested and remains an
 unresolved acceptance gap.
 No REFACTOR commit was needed for basic duplicate detection; eager dictionary
 initialization is retained because its small allocation is acceptable. The
@@ -43,9 +43,9 @@ acceptance criteria. No unresolved conflict blocks design:
   not by the constructor.
 
 Approved behavior includes the `IsUniqueAndProcess(string transactionId)`
-entry point; normalized GUID identity; true for first-seen IDs; false for
-active duplicates; expiration at the exact last-accepted-attempt-plus-duration
-boundary; positive configurable expiration and
+entry point; normalized GUID identity; true for first-seen IDs; false plus
+expiration refresh for active duplicates; expiration at the exact
+last-attempt-plus-duration boundary; positive configurable expiration and
 capacity; invalid inputs throwing `ArgumentException` without state changes;
 expired-ID reclamation before capacity enforcement; rejection of a new ID
 without active-state change when full; continued recognition of active
@@ -132,8 +132,8 @@ Operation outline:
    input/configuration fails before lazy state or worker initialization.
 2. Use the instance map and lazily start the cleaner after valid input.
 3. On a map hit, lock only that entry and recheck that it is still the current
-   map value. If `currentTime < lastAttempt + expiration`, return `false`
-   without changing last-attempt time.
+   map value. If `currentTime < lastAttempt + expiration`, update
+   last-attempt time and return `false`.
 4. If that entry is expired at
    `currentTime >= lastAttempt + expiration`, release its entry
    gate before acquiring the admission gate. Revalidate it, remove it once,
@@ -170,8 +170,9 @@ system-clock adjustments, unlike the original monotonic-clock proposal.
 Sample time consistently with entry synchronization. Exact-boundary tests
 must use the fake provider and never sleep. Expiration tests explicitly
 configure a randomized duration; separate tests check active behavior before
-the boundary and acceptance at the boundary. The test fake supports concise
-advancement such as `Now += 10.Seconds()`.
+the boundary, refresh from a duplicate attempt, and acceptance at the
+boundary. The test fake supports concise advancement such as
+`Now += 10.Seconds()`.
 
 ## Benchmark comparator
 
