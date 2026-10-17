@@ -177,8 +177,11 @@ to the coder log and update this section without deleting the history.
   class. Both production code and tests must format and reuse that same
   template through `StringExtensions.Format`; neither should duplicate the
   message text. This improves readability and lowers maintenance cost by
-  keeping message changes in one place. In tests, alias `ValidationError` as
-  `Error` for concise assertions.
+  keeping message changes in one place. Error assertions must compare the
+  complete exception message and include the explicit invalid value in a
+  shared reusable template. Use that template in the assertion rather than
+  duplicating message text. In tests, alias `ValidationError` as `Error` for
+  concise assertions.
 - Prefer small, meaningfully named extension methods when they replace
   unreadable constructions with unrelated parameters. Optimize call sites for
   clear intent and readability while keeping the helper behavior focused.

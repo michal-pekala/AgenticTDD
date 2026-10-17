@@ -100,4 +100,16 @@ public sealed class SingleTransactionTests
         Sut.IsUniqueAndProcess(transactionId)
             .Should().BeTrue();
     }
+
+    [Fact]
+    public void Non_positive_expiration_is_rejected()
+    {
+        _options.UniqnessCheckExpiration = TimeSpan.Zero;
+
+        FluentActions
+            .Invoking(() => Sut.IsUniqueAndProcess(Guid.NewGuid().ToString()))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .Which.Message.Should()
+            .Be(Error.InvalidUniqnessCheckExpiration.Format(_options.UniqnessCheckExpiration));
+    }
 }
