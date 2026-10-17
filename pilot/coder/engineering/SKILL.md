@@ -166,6 +166,8 @@ to the coder log and update this section without deleting the history.
   `.Should().BeTrue()` on one line.
 - In implementation methods, separate logically distinct statements with a
   blank line to make the steps easier to scan.
+- Prefer expression-bodied methods for one-line implementations when it keeps
+  the method clear; this applies generally, including private test helpers.
 - Name tests for the behavior they demonstrate, without claims the test does
   not verify (for example, use `New_transaction_can_be_processed` rather
   than implying sequence history or input validation).
@@ -188,6 +190,11 @@ to the coder log and update this section without deleting the history.
 - Prefer small, meaningfully named extension methods when they replace
   unreadable constructions with unrelated parameters. Optimize call sites for
   clear intent and readability while keeping the helper behavior focused.
+- When multiple option checks share the same validation shape, use a focused
+  generic helper that accepts the option value, a `Func<T, bool>` validity
+  condition, and an error-message template. Format the template with the value
+  inside the helper when validation fails, then throw the appropriate
+  validation exception.
 - Group tests by scenario size: use `SingleTransactionTests` for single-ID
   behavior, then introduce clearly named test classes for multiple-ID
   scenarios as coverage grows.

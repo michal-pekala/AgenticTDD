@@ -17,8 +17,8 @@ handling uses direct dictionary lookup; synchronization is explicitly
 deferred as requested and remains an unresolved acceptance gap.
 Non-positive expiration validation has completed RED and GREEN; the operation
 reports an `ArgumentOutOfRangeException` with the configured value in its
-message before processing the transaction. No additional REFACTOR was
-warranted because the validation is already isolated in `ValidateOptions`.
+message before processing the transaction. The REFACTOR step extracted the
+shared exception construction into a private helper.
 Non-positive capacity validation has completed RED and GREEN; zero and
 negative values are rejected on the operation path with the configured value
 in the full exception message.

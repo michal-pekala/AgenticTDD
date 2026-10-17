@@ -106,11 +106,8 @@ public sealed class SingleTransactionTests
     {
         _options.UniqnessCheckExpiration = TimeSpan.Zero;
 
-        FluentActions
-            .Invoking(() => Sut.IsUniqueAndProcess(Guid.NewGuid().ToString()))
-            .Should().Throw<ArgumentOutOfRangeException>()
-            .Which.Message.Should()
-            .Be(Error.InvalidUniqnessCheckExpiration.Format(_options.UniqnessCheckExpiration));
+        AssertInvalidOptionIsRejected(
+            Error.InvalidUniqnessCheckExpiration.Format(_options.UniqnessCheckExpiration));
     }
 
     [Theory]
@@ -120,10 +117,14 @@ public sealed class SingleTransactionTests
     {
         _options.UniqnessBufferCapacity = capacity;
 
-        FluentActions
+        AssertInvalidOptionIsRejected(
+            Error.InvalidUniqnessBufferCapacity.Format(_options.UniqnessBufferCapacity));
+    }
+
+    private void AssertInvalidOptionIsRejected(string expectedErrorMessage)
+        => FluentActions
             .Invoking(() => Sut.IsUniqueAndProcess(Guid.NewGuid().ToString()))
             .Should().Throw<ArgumentOutOfRangeException>()
             .Which.Message.Should()
-            .Be(Error.InvalidUniqnessBufferCapacity.Format(_options.UniqnessBufferCapacity));
-    }
+            .Be(expectedErrorMessage);
 }

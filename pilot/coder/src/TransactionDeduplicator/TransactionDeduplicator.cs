@@ -39,22 +39,27 @@ public sealed class TransactionDeduplicator
 
     private void ValidateOptions()
     {
-        if (_options.UniqnessCheckExpiration <= TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(
-                paramName: null,
-                message:
-                ValidationError.InvalidUniqnessCheckExpiration.Format(
-                    _options.UniqnessCheckExpiration));
-        }
+        ValidateOption(
+            _options.UniqnessCheckExpiration,
+            expiration => expiration > TimeSpan.Zero,
+            ValidationError.InvalidUniqnessCheckExpiration);
 
-        if (_options.UniqnessBufferCapacity <= 0)
+        ValidateOption(
+            _options.UniqnessBufferCapacity,
+            capacity => capacity > 0,
+            ValidationError.InvalidUniqnessBufferCapacity);
+    }
+
+    private static void ValidateOption<T>(
+        T value,
+        Func<T, bool> condition,
+        string errorMessageTemplate)
+    {
+        if (!condition(value))
         {
             throw new ArgumentOutOfRangeException(
                 paramName: null,
-                message:
-                ValidationError.InvalidUniqnessBufferCapacity.Format(
-                    _options.UniqnessBufferCapacity));
+                errorMessageTemplate.Format(value));
         }
     }
 
