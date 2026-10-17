@@ -5,6 +5,21 @@ namespace TransactionDeduplicator.Pilot;
 public sealed class TransactionDeduplicator
 {
     private readonly ConcurrentDictionary<Guid, byte> _transactions = new();
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly TransactionDeduplicatorOptions _options;
+
+    public TransactionDeduplicator()
+        : this(new SystemDateTimeProvider(), new TransactionDeduplicatorOptions())
+    {
+    }
+
+    internal TransactionDeduplicator(
+        IDateTimeProvider dateTimeProvider,
+        TransactionDeduplicatorOptions options)
+    {
+        _dateTimeProvider = dateTimeProvider;
+        _options = options;
+    }
 
     public bool IsUniqueAndProcess(string transactionId)
     {

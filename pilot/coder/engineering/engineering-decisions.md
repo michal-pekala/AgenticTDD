@@ -604,3 +604,45 @@ identified.
 - Affected work: TDD commit workflow, design status, and future refactor
   stages.
 - Status: Active.
+
+### C-037 - Inject a DateTimeOffset provider for expiry tests
+
+- Recorded at: 2026-10-17T18:44:37+02:00
+- Decision time: 2026-10-17T18:44:37+02:00
+- Context/question: Expiration refresh and exact-boundary behavior require
+  deterministic control of current time in tests.
+- Engineer decision: Add an internal `IDateTimeProvider` with a minimal
+  `DateTimeOffset CurrentTime` property and inject it through an internal
+  constructor. The production provider reads `DateTimeOffset.UtcNow`; tests
+  use a fake with explicitly advanceable time. This supersedes the monotonic
+  clock proposal and accepts the risk of wall-clock adjustments.
+- Affected work: Expiry behavior, test seam, and design.
+- Status: Active.
+
+### C-038 - Configure expiry through options in focused tests
+
+- Recorded at: 2026-10-17T19:04:27+02:00
+- Decision time: 2026-10-17T19:04:27+02:00
+- Context/question: Expiry tests need to demonstrate that behavior follows
+  the configured expiration rather than a fixed/default duration.
+- Engineer decision: Use a `TransactionDeduplicatorOptions` object with
+  `UniqnessCheckExpiration` and `UniqnessBufferCapacity`, and configure a
+  randomized expiration explicitly in each expiry test. Keep one class-level
+  `Sut` and fake date-time provider per test-class instance, expose fake time
+  through a `Now` property, and split within-window duplicate and
+  post-expiration acceptance assertions into separate tests.
+- Affected work: Options API, expiry test structure, and coding guidance.
+- Status: Active.
+
+### C-039 - Place acts and assertions on separate lines
+
+- Recorded at: 2026-10-17T19:10:17+02:00
+- Decision time: 2026-10-17T19:10:17+02:00
+- Context/question: Act and assertion expressions are easier to scan when
+  visually separated.
+- Engineer decision: Keep the act and its FluentAssertions assertion on
+  separate physical lines in the same expression. Do not add an intermediate
+  result variable solely for separation. Apply this immediately to new tests
+  and when editing existing tests.
+- Affected work: Test style and coding skill.
+- Status: Active.

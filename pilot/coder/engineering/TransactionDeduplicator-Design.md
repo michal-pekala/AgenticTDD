@@ -9,10 +9,11 @@ and REFACTOR commits. The malformed-ID validation has completed RED, GREEN,
 and REFACTOR; its parser now returns the normalized GUID for subsequent
 identity handling. Active-duplicate detection has completed RED and GREEN:
 GUIDs are registered in a concurrent dictionary, so repeats are rejected as
-duplicates. No REFACTOR commit was needed for this behavior; eager dictionary
-initialization is retained because its small allocation is acceptable.
-Expiration, capacity, and cleanup remain future tested stages. No benchmark
-project has been created yet.
+duplicates. Duplicate refresh and exact-boundary expiration are now in RED,
+with an injected `IDateTimeProvider` test seam. No REFACTOR commit was needed
+for basic duplicate detection; eager dictionary initialization is retained
+because its small allocation is acceptable. Capacity and cleanup remain
+future tested stages. No benchmark project has been created yet.
 
 ## Approved acceptance basis
 
@@ -83,9 +84,9 @@ the design and decision log, remain under `pilot/coder`.
   these scalar values at construction; live reconfiguration is not part of
   the approved scope.
 - The constructor only copies supplied values or defaults. It does not
-  validate configuration, throw for invalid values, or create collections,
-  locks, timers, or a worker. The component's ordinary object allocation is
-  unavoidable; expensive state and background resources are deferred.
+  validate configuration, throw for invalid values, or create locks, timers,
+  or a worker. The small initial dictionary allocation is accepted; more
+  expensive state and background resources are deferred.
 - Separate helpers validate options and parse the input. Positive expiration
   and capacity are checked from the execution path and invalid configuration
   throws a clear `ArgumentOutOfRangeException` there. Parse using
@@ -102,9 +103,9 @@ the design and decision log, remain under `pilot/coder`.
 
 ## Concurrency, capacity, and expiration proposal
 
-The preferred candidate uses a lazily initialized
-`ConcurrentDictionary<Guid, Entry>`. Each entry holds one last-attempt
-monotonic timestamp and acts as its per-entry synchronization gate. Duplicate
+The preferred candidate uses a `ConcurrentDictionary<Guid, Entry>`. Each
+entry holds one last-attempt `DateTimeOffset` and acts as its per-entry
+synchronization gate. Duplicate
 calls on different IDs do not contend on a single global lock; duplicate
 calls on the same ID serialize only while checking or refreshing that entry.
 Refreshing mutates the existing entry, so it does not add an expiry record or
@@ -123,11 +124,12 @@ Operation outline:
 
 1. Validate options and parse the GUID through separate helpers. Invalid
    input/configuration fails before lazy state or worker initialization.
-2. Lazily create the map and cleaner on the first valid call.
+2. Use the instance map and lazily start the cleaner after valid input.
 3. On a map hit, lock only that entry and recheck that it is still the current
-   map value. If elapsed monotonic time is less than the configured
-   expiration, update last-attempt time and return `false`.
-4. If that entry is expired at `elapsed >= expiration`, release its entry
+   map value. If `currentTime < lastAttempt + expiration`, update
+   last-attempt time and return `false`.
+4. If that entry is expired at
+   `currentTime >= lastAttempt + expiration`, release its entry
    gate before acquiring the admission gate. Revalidate it, remove it once,
    and retry as a new ID. This keeps lock ordering consistent and avoids a
    per-entry-to-admission lock inversion.
@@ -154,9 +156,16 @@ A containing host owns and disposes the cleaner; provide deterministic
 disposal so a DI container can stop it. State remains process-local and
 instance-local.
 
-Use a `Stopwatch`-backed monotonic clock behind an internal test seam, never
-wall-clock time. Sample while holding the entry gate for duplicate refresh.
-A fake clock allows exact-boundary tests without sleeping.
+Use an internal `IDateTimeProvider` exposing a `DateTimeOffset CurrentTime`
+property. The default provider reads `DateTimeOffset.UtcNow`; tests inject a
+fake provider whose time can be advanced deterministically. This engineer-
+selected wall-clock approach is simpler to inject but may be affected by
+system-clock adjustments, unlike the original monotonic-clock proposal.
+Sample time consistently with entry synchronization. Exact-boundary tests
+must use the fake provider and never sleep. Expiration tests explicitly
+configure a randomized duration; separate tests check active behavior before
+the boundary and acceptance at the boundary. The test fake supports concise
+advancement such as `Now += 10.Seconds()`.
 
 ## Benchmark comparator
 
@@ -169,8 +178,8 @@ be bottlenecks; the global-lock version may win for small workloads.
 ## Testing plan
 
 Use XUnit and FluentAssertions if compatible with the selected .NET 10
-package versions. Use an injected fake monotonic clock and an internal manual
-cleaner trigger for deterministic tests.
+package versions. Use an injected fake `IDateTimeProvider` and an internal
+manual cleaner trigger for deterministic tests.
 
 - Defaults and positive configuration; invalid configuration throws from the
   operation path, not the constructor.

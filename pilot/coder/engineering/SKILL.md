@@ -90,8 +90,9 @@ to the coder log and update this section without deleting the history.
 - Extract GUID parsing and configuration/parameter validation into separate
   helpers; keep the core operation readable.
 - The constructor must not throw for invalid configuration or initialize
-  collections, locks, timers, or background workers. Validate on the
-  operation path; lazily create expensive state/resources after valid input.
+  locks, timers, or background workers. The small initial dictionary
+  allocation is acceptable. Validate on the operation path; lazily create
+  expensive state/resources after valid input.
 - The approved design prefers `ConcurrentDictionary` and a separate
   background cleaner over a global lock. Compare it against a global-lock
   baseline; this preference is not a measured performance claim. Preserve
@@ -139,18 +140,22 @@ to the coder log and update this section without deleting the history.
 
 ### Test style and benchmark requirements
 
-- Use a fake monotonic clock for deterministic expiry tests; do not sleep to
-  test boundaries. Cover parsing, configuration, first-seen and duplicate
+- Use an injected fake `IDateTimeProvider` for deterministic expiry tests;
+  do not sleep to test boundaries. The selected `DateTimeOffset` clock can
+  move with system-clock adjustments; preserve this explicit tradeoff unless
+  the engineer changes it. Give expiry tests a randomized configured
+  `UniqnessCheckExpiration` and assert within-window and expired behavior in
+  separate tests. Cover parsing, configuration, first-seen and duplicate
   behavior, refresh, exact-boundary expiry, capacity, invalid-input
   no-mutation, bounded bookkeeping, concurrent calls/cleanup, instance
   isolation, and cleaner disposal/failure visibility.
 - Keep tests minimal. Use a private readonly class-level system-under-test
-  property named `Sut` where appropriate. For a single act and assertion,
-  prefer an expression-bodied test with the method declaration on one line
-  and `=> Sut` on the next. Put each operation/assertion call on its own
-  following line indented one level further than `=> Sut`. Keep simple
-  FluentAssertions chains such as `.Should().BeTrue()` on one line. Do not
-  create an intermediate result variable or `Act()`/`Assert()` abstraction.
+  property named `Sut` where appropriate. Keep each act and its FluentAssertions
+  assertion on separate physical lines in the same expression; do not create
+  an intermediate result variable solely to separate them. For a single act
+  and assertion, prefer an expression-bodied test with the method declaration
+  on one line and `=> Sut` on the next. Keep simple chains such as
+  `.Should().BeTrue()` on one line.
 - Name tests for the behavior they demonstrate, without claims the test does
   not verify (for example, use `New_transaction_can_be_processed` rather
   than implying sequence history or input validation).
@@ -220,9 +225,10 @@ or performance success without evidence.
 - Keep GUID parsing and configuration/parameter validation in separate
   helpers so the core operation remains readable.
 - The constructor must not throw for invalid configuration or initialize
-  collections, locks, timers, or background workers. Validate configuration
-  on the operation path before state changes; create expensive state and
-  background resources lazily after valid input.
+  locks, timers, or background workers. The small initial dictionary
+  allocation is acceptable. Validate configuration on the operation path
+  before state changes; create expensive state and background resources
+  lazily after valid input.
 
 ## Design approval and current proposal
 
@@ -278,8 +284,9 @@ if general repository guidance permits other workflows.
 
 ## Quality and handoff
 
-Keep tests deterministic with an injected fake monotonic clock; do not rely on
-sleeping for expiration-boundary tests. Cover capacity and concurrency races,
+Keep tests deterministic with an injected fake `IDateTimeProvider`; do not
+rely on sleeping for expiration-boundary tests. Cover capacity and concurrency
+races,
 including repeated duplicate refresh and cleanup. Preserve state-count
 invariants and avoid unbounded refresh bookkeeping.
 

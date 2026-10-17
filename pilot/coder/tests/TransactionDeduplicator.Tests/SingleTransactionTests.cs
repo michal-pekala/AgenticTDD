@@ -7,7 +7,18 @@ namespace TransactionDeduplicator.Tests;
 
 public sealed class SingleTransactionTests
 {
-    private Deduplicator Sut { get; } = new();
+    private readonly FakeDateTimeProvider _dateTimeProvider = new();
+    private readonly TransactionDeduplicatorOptions _options = new();
+    private Deduplicator? _sut;
+
+    private Deduplicator Sut
+        => _sut ??= new Deduplicator(_dateTimeProvider, _options);
+
+    private DateTimeOffset Now
+    {
+        get => _dateTimeProvider.Now;
+        set => _dateTimeProvider.Now = value;
+    }
 
     [Fact]
     public void New_transaction_can_be_processed()
@@ -31,7 +42,56 @@ public sealed class SingleTransactionTests
     {
         var transactionId = Guid.NewGuid().ToString();
 
-        Sut.IsUniqueAndProcess(transactionId).Should().BeTrue();
-        Sut.IsUniqueAndProcess(transactionId).Should().BeFalse();
+        Sut.IsUniqueAndProcess(transactionId)
+            .Should().BeTrue();
+
+        Sut.IsUniqueAndProcess(transactionId)
+            .Should().BeFalse();
     }
+
+    [Fact]
+    public void Active_transaction_duplicate_is_rejected_within_expiration_window()
+    {
+        _options.UniqnessCheckExpiration = Random.Shared.Next(2, 30).Seconds();
+        var transactionId = Guid.NewGuid().ToString();
+
+        Sut.IsUniqueAndProcess(transactionId)
+            .Should().BeTrue();
+
+        Now += _options.UniqnessCheckExpiration - 1.Milliseconds();
+
+        Sut.IsUniqueAndProcess(transactionId)
+            .Should().BeFalse();
+    }
+
+    [Fact]
+    public void Expired_transaction_can_be_processed_again()
+    {
+        _options.UniqnessCheckExpiration = Random.Shared.Next(2, 30).Seconds();
+        var transactionId = Guid.NewGuid().ToString();
+
+        Sut.IsUniqueAndProcess(transactionId)
+            .Should().BeTrue();
+
+        Now += _options.UniqnessCheckExpiration;
+
+        Sut.IsUniqueAndProcess(transactionId)
+            .Should().BeTrue();
+    }
+
+    private sealed class FakeDateTimeProvider : IDateTimeProvider
+    {
+        public DateTimeOffset Now { get; set; } = DateTimeOffset.UnixEpoch;
+
+        public DateTimeOffset CurrentTime => Now;
+    }
+}
+
+internal static class TimeSpanExtensions
+{
+    internal static TimeSpan Seconds(this int seconds)
+        => TimeSpan.FromSeconds(seconds);
+
+    internal static TimeSpan Milliseconds(this int milliseconds)
+        => TimeSpan.FromMilliseconds(milliseconds);
 }
