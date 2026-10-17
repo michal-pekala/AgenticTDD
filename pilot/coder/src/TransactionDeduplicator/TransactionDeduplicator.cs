@@ -29,6 +29,7 @@ public sealed class TransactionDeduplicator
         if (_transactions.TryGetValue(parsedTransactionId, out var lastAttempt)
             && currentTime < lastAttempt + _options.UniqnessCheckExpiration)
         {
+            _transactions[parsedTransactionId] = currentTime;
             return false;
         }
 
