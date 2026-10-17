@@ -678,3 +678,20 @@ identified.
 - Affected work: Duplicate expiration semantics, skill, and design.
 - Status: Active; supersedes D-001 and the handoff's duplicate-refresh
   requirement for current scope.
+
+### C-042 - Implement designed behavior only when required by tests
+
+- Recorded at: 2026-10-17T19:33:12+02:00
+- Decision time: 2026-10-17T19:33:12+02:00
+- Context/question: The approved overall design includes requirements such as
+  thread synchronization and duplicate expiration refresh that are not yet
+  covered by focused tests.
+- Engineer decision: Follow test-driven development strictly. The approved
+  design remains the overall target, but implementation changes must be
+  driven by the active focused test. Do not proactively implement
+  synchronization, expiration refresh, or other behavior until a test
+  explicitly requires it; introduce those requirements in later RED/GREEN
+  stages.
+- Affected work: TDD implementation scope, coding skill, and future test
+  stages.
+- Status: Active.

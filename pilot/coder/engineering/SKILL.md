@@ -134,6 +134,11 @@ to the coder log and update this section without deleting the history.
   related design or decision updates. Preserve the RED -> GREEN order and,
   when worthwhile, the REFACTOR step; the engineer approval gate applies
   after every commit.
+- Treat the approved design as the overall target, not authorization to
+  implement every designed behavior at once. Let the active failing test drive
+  each implementation change; do not add synchronization, expiry refresh, or
+  other behavior until a focused test explicitly requires it. Add remaining
+  designed requirements through later RED/GREEN stages.
 - Keep a timestamped, append-only record of explicit engineer decisions in
   `engineering-decisions.md`. Preserve history. When the original decision
   time is unknown, record entry time with UTC offset and label it
