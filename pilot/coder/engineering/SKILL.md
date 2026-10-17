@@ -151,7 +151,9 @@ to the coder log and update this section without deleting the history.
   move with system-clock adjustments; preserve this explicit tradeoff unless
   the engineer changes it. Give expiry tests a randomized configured
   `UniqnessCheckExpiration` and assert within-window and expired behavior in
-  separate tests. Cover parsing, configuration, first-seen and duplicate
+  separate tests. Keep reusable fakes in the test project's `Fixture`
+  directory and reuse ecosystem-provided extensions rather than duplicating
+  them locally. Cover parsing, configuration, first-seen and duplicate
   behavior, refresh, exact-boundary expiry, capacity, invalid-input
   no-mutation, bounded bookkeeping, concurrent calls/cleanup, instance
   isolation, and cleaner disposal/failure visibility.

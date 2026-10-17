@@ -695,3 +695,16 @@ identified.
 - Affected work: TDD implementation scope, coding skill, and future test
   stages.
 - Status: Active.
+
+### C-043 - Share test fixtures and reuse library extensions
+
+- Recorded at: 2026-10-17T19:40:07+02:00
+- Decision time: 2026-10-17T19:40:07+02:00
+- Context/question: The fake date-time provider should be reusable, and
+  locally defined duration extensions duplicated helpers already available
+  from FluentAssertions.
+- Engineer decision: Place reusable test fakes under the test project's
+  `Fixture` directory and prefer existing ecosystem extensions, such as
+  FluentAssertions' `Seconds()` and `Milliseconds()`, over local duplicates.
+- Affected work: Test project organization, test helpers, and coding skill.
+- Status: Active.

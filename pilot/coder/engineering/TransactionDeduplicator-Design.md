@@ -16,9 +16,10 @@ handoff and D-001 behavior. Expiry handling uses direct dictionary lookup;
 synchronization is explicitly deferred as requested and remains an
 unresolved acceptance gap.
 No REFACTOR commit was needed for basic duplicate detection; eager dictionary
-initialization is retained because its small allocation is acceptable.
-Capacity and cleanup remain future tested stages. No benchmark project has
-been created yet.
+initialization is retained because its small allocation is acceptable. The
+expiry test fake is shared from the test `Fixture` directory, and
+FluentAssertions' duration extensions are reused. Capacity and cleanup remain
+future tested stages. No benchmark project has been created yet.
 
 ## Approved acceptance basis
 

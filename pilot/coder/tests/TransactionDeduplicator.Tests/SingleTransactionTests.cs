@@ -1,7 +1,9 @@
 using FluentAssertions;
+using FluentAssertions.Extensions;
 using TransactionDeduplicator.Pilot;
 using Deduplicator = TransactionDeduplicator.Pilot.TransactionDeduplicator;
 using Error = TransactionDeduplicator.Pilot.ValidationError;
+using TransactionDeduplicator.Tests.Fixture;
 
 namespace TransactionDeduplicator.Tests;
 
@@ -78,20 +80,4 @@ public sealed class SingleTransactionTests
         Sut.IsUniqueAndProcess(transactionId)
             .Should().BeTrue();
     }
-
-    private sealed class FakeDateTimeProvider : IDateTimeProvider
-    {
-        public DateTimeOffset Now { get; set; } = DateTimeOffset.UnixEpoch;
-
-        public DateTimeOffset CurrentTime => Now;
-    }
-}
-
-internal static class TimeSpanExtensions
-{
-    internal static TimeSpan Seconds(this int seconds)
-        => TimeSpan.FromSeconds(seconds);
-
-    internal static TimeSpan Milliseconds(this int milliseconds)
-        => TimeSpan.FromMilliseconds(milliseconds);
 }
