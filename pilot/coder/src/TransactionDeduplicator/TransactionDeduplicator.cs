@@ -24,41 +24,16 @@ public sealed class TransactionDeduplicator
     public bool IsUniqueAndProcess(string transactionId)
     {
         var parsedTransactionId = ParseTransactionId(transactionId);
+        var currentTime = _dateTimeProvider.CurrentTime;
 
-        while (true)
+        if (_transactions.TryGetValue(parsedTransactionId, out var lastAttempt)
+            && currentTime < lastAttempt + _options.UniqnessCheckExpiration)
         {
-            var currentTime = _dateTimeProvider.CurrentTime;
-            if (_transactions.TryAdd(parsedTransactionId, currentTime))
-            {
-                return true;
-            }
-
-            if (!_transactions.TryGetValue(parsedTransactionId, out var lastAttempt))
-            {
-                continue;
-            }
-
-            currentTime = _dateTimeProvider.CurrentTime;
-            if (currentTime >= lastAttempt + _options.UniqnessCheckExpiration)
-            {
-                var expiredEntry = new KeyValuePair<Guid, DateTimeOffset>(
-                    parsedTransactionId,
-                    lastAttempt);
-
-                if (((ICollection<KeyValuePair<Guid, DateTimeOffset>>)_transactions)
-                    .Remove(expiredEntry))
-                {
-                    continue;
-                }
-
-                continue;
-            }
-
-            if (_transactions.TryUpdate(parsedTransactionId, currentTime, lastAttempt))
-            {
-                return false;
-            }
+            return false;
         }
+
+        _transactions[parsedTransactionId] = currentTime;
+        return true;
     }
 
     private static Guid ParseTransactionId(string transactionId)

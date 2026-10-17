@@ -646,3 +646,35 @@ identified.
   and when editing existing tests.
 - Affected work: Test style and coding skill.
 - Status: Active.
+
+### C-040 - Defer synchronization while implementing single-threaded expiry
+
+- Recorded at: 2026-10-17T19:27:01+02:00
+- Decision time: 2026-10-17T19:27:01+02:00
+- Context/question: The expiration GREEN implementation used an unbounded
+  retry loop to address concurrent dictionary update/removal races, although
+  current focused tests exercise only single-threaded behavior.
+- Engineer decision: For the current expiration implementation, use a direct
+  dictionary lookup and timestamp replacement based on whether the ID is
+  present and still active. Defer thread synchronization rather than
+  retaining the retry loop. This knowingly leaves the approved concurrency
+  criterion unimplemented until separately tested and addressed.
+- Affected work: Expiration GREEN/REFACTOR implementation and concurrency
+  acceptance gap.
+- Status: Active.
+
+### C-041 - Defer duplicate expiration refresh from current scope
+
+- Recorded at: 2026-10-17T19:31:22+02:00
+- Decision time: 2026-10-17T19:31:10+02:00
+- Context/question: The current focused tests verify duplicate rejection
+  within the configured expiration window and acceptance at the boundary,
+  but do not verify refresh from a duplicate attempt.
+- Engineer decision: Remove timestamp refresh on active duplicates. Expire
+  IDs based on the last accepted attempt, while still returning `false` for
+  active duplicates. This supersedes the original analyst handoff and D-001
+  requirement to refresh expiration; that requirement is out of the current
+  implementation scope until explicitly restored with a focused test.
+- Affected work: Duplicate expiration semantics, skill, and design.
+- Status: Active; supersedes D-001 and the handoff's duplicate-refresh
+  requirement for current scope.

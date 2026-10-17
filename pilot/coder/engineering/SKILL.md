@@ -50,9 +50,10 @@ to the coder log and update this section without deleting the history.
 - Null, empty, whitespace-only, and malformed IDs throw `ArgumentException`
   without changing state.
 - A first-seen active-window ID returns `true`. An active duplicate returns
-  `false` and refreshes expiration from that duplicate attempt. Expiration is
-  exactly at last attempt plus configured duration; at the boundary the ID
-  is expired and can be accepted again.
+  `false`. Per C-041, duplicate attempts do not refresh expiration; expiration
+  is measured from the last accepted attempt and at that exact boundary the ID
+  is expired and can be accepted again. This supersedes the original analyst
+  handoff and D-001 requirement to refresh on duplicates.
 - `UniqnessCheckExpiration` defaults to 10 seconds and
   `UniqnessBufferCapacity` defaults to 1,000,000 active IDs. Both are
   configurable and positive. Invalid configuration is reported clearly from
@@ -207,11 +208,12 @@ the dedicated exception separately as an API contract.
 The approved behavior also requires GUID normalization; `ArgumentException`
 for null, empty, whitespace-only, or malformed IDs without state changes;
 positive configuration with invalid values reported from an operation call
-before state changes; duplicate expiration refresh; expiration at the exact
-boundary; reclaiming expired IDs before capacity checks; thread safety;
-instance/process-local memory; and the stated performance and memory-bound
-criteria. Do not claim durability, cross-instance sharing, ACID guarantees,
-or performance success without evidence.
+before state changes; expiration at the exact boundary; reclaiming expired
+IDs before capacity checks; thread safety; instance/process-local memory; and
+the stated performance and memory-bound criteria. C-041 explicitly defers
+duplicate expiration refresh from current implementation scope. Do not claim
+durability, cross-instance sharing, ACID guarantees, or performance success
+without evidence.
 
 ## Project and API decisions
 
