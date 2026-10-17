@@ -32,6 +32,13 @@ public sealed class TransactionDeduplicator
             _transactions.TryGetValue(parsedTransactionId, out var lastAttempt)
             && currentTime < lastAttempt + _options.UniqnessCheckExpiration;
 
+        if (!isActiveDuplicate
+            && !_transactions.ContainsKey(parsedTransactionId)
+            && _transactions.Count >= _options.UniqnessBufferCapacity)
+        {
+            throw new CapacityExceededException(_options.UniqnessBufferCapacity);
+        }
+
         _transactions[parsedTransactionId] = currentTime;
 
         return !isActiveDuplicate;

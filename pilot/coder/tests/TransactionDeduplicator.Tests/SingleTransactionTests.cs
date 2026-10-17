@@ -133,7 +133,9 @@ public sealed class SingleTransactionTests
 
         FluentActions
             .Invoking(() => Sut.IsUniqueAndProcess(newTransactionId))
-            .Should().Throw<Exception>();
+            .Should().Throw<CapacityExceededException>()
+            .Which.Message.Should()
+            .Be(Error.CapacityExceeded.Format(_options.UniqnessBufferCapacity));
 
         Sut.IsUniqueAndProcess(activeTransactionId)
             .Should().BeFalse();

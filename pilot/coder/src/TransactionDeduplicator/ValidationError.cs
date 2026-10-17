@@ -10,4 +10,7 @@ public static class ValidationError
 
     public const string InvalidUniqnessBufferCapacity =
         "UniqnessBufferCapacity value '{0}' must be greater than zero.";
+
+    public const string CapacityExceeded =
+        "Transaction buffer capacity of {0} has been reached.";
 }
