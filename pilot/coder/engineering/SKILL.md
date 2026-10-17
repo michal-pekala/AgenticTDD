@@ -173,6 +173,9 @@ to the coder log and update this section without deleting the history.
   randomized value from that category instead of a specific constant that
   might appear specially handled. For example, generate valid GUIDs for
   generic happy paths and generated non-GUID strings for malformed-ID tests.
+  An explicit constant is acceptable when the test requires a specific value,
+  or when xUnit `InlineData` requires literal arguments and expressions cannot
+  be supplied; otherwise, prefer randomized representatives for generic cases.
 - Define each reusable error-message template once in the source `ValidationError`
   class. Both production code and tests must format and reuse that same
   template through `StringExtensions.Format`; neither should duplicate the

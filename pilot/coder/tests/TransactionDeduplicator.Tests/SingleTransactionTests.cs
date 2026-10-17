@@ -112,4 +112,18 @@ public sealed class SingleTransactionTests
             .Which.Message.Should()
             .Be(Error.InvalidUniqnessCheckExpiration.Format(_options.UniqnessCheckExpiration));
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Non_positive_capacity_is_rejected(int capacity)
+    {
+        _options.UniqnessBufferCapacity = capacity;
+
+        FluentActions
+            .Invoking(() => Sut.IsUniqueAndProcess(Guid.NewGuid().ToString()))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .Which.Message.Should()
+            .Be(Error.InvalidUniqnessBufferCapacity.Format(_options.UniqnessBufferCapacity));
+    }
 }

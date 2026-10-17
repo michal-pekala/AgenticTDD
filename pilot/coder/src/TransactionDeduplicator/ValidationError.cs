@@ -7,4 +7,7 @@ public static class ValidationError
 
     public const string InvalidUniqnessCheckExpiration =
         "UniqnessCheckExpiration value '{0}' must be greater than zero.";
+
+    public const string InvalidUniqnessBufferCapacity =
+        "UniqnessBufferCapacity value '{0}' must be greater than zero.";
 }
