@@ -26,15 +26,13 @@ public sealed class TransactionDeduplicator
         var parsedTransactionId = ParseTransactionId(transactionId);
         var currentTime = _dateTimeProvider.CurrentTime;
 
-        if (_transactions.TryGetValue(parsedTransactionId, out var lastAttempt)
-            && currentTime < lastAttempt + _options.UniqnessCheckExpiration)
-        {
-            _transactions[parsedTransactionId] = currentTime;
-            return false;
-        }
+        var isActiveDuplicate =
+            _transactions.TryGetValue(parsedTransactionId, out var lastAttempt)
+            && currentTime < lastAttempt + _options.UniqnessCheckExpiration;
 
         _transactions[parsedTransactionId] = currentTime;
-        return true;
+
+        return !isActiveDuplicate;
     }
 
     private static Guid ParseTransactionId(string transactionId)

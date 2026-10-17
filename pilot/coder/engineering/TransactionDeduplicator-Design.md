@@ -11,9 +11,10 @@ identity handling. Active-duplicate detection has completed RED and GREEN:
 GUIDs are registered in a concurrent dictionary, so repeats are rejected as
 duplicates. Configurable expiration and exact-boundary behavior are
 implemented using the injected `IDateTimeProvider`. Duplicate expiration
-refresh has completed RED and GREEN per C-044. Expiry handling uses direct
-dictionary lookup; synchronization is explicitly deferred as requested and
-remains an unresolved acceptance gap.
+refresh has completed RED, GREEN, and REFACTOR per C-044; timestamp storage
+is shared across the active-duplicate and new/expired-ID paths. Expiry
+handling uses direct dictionary lookup; synchronization is explicitly
+deferred as requested and remains an unresolved acceptance gap.
 No REFACTOR commit was needed for basic duplicate detection; eager dictionary
 initialization is retained because its small allocation is acceptable. The
 expiry test fake is shared from the test `Fixture` directory, and

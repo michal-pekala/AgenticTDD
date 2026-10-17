@@ -164,6 +164,8 @@ to the coder log and update this section without deleting the history.
   and assertion, prefer an expression-bodied test with the method declaration
   on one line and `=> Sut` on the next. Keep simple chains such as
   `.Should().BeTrue()` on one line.
+- In implementation methods, separate logically distinct statements with a
+  blank line to make the steps easier to scan.
 - Name tests for the behavior they demonstrate, without claims the test does
   not verify (for example, use `New_transaction_can_be_processed` rather
   than implying sequence history or input validation).
