@@ -24,7 +24,9 @@ negative values are rejected on the operation path with the configured value
 in the full exception message.
 The focused capacity-limit behavior has completed RED and GREEN: new IDs are
 rejected with `CapacityExceededException` when the tracked entry count is at
-capacity, while an existing active duplicate is still processed first.
+capacity, while an existing active duplicate is still processed first. Its
+test is grouped in `MultipleTransactionTests`, which shares options, fake
+time, and the lazy system under test through `BaseTransactionDeduplicatorTest`.
 No REFACTOR commit was needed for basic duplicate detection; eager dictionary
 initialization is retained because its small allocation is acceptable. The
 expiry test fake is shared from the test `Fixture` directory, and

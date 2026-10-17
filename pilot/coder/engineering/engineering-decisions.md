@@ -723,3 +723,28 @@ identified.
 - Affected work: Duplicate-refresh test, expiration behavior, and coding
   guidance.
 - Status: Active.
+
+### C-045 - Put reusable test assertions in SUT extensions
+
+- Recorded at: 2026-10-18T00:42:20+02:00
+- Decision time: 2026-10-18T00:42:20+02:00
+- Context/question: The generic exception assertion is reused across tests
+  and should be callable directly on the system under test.
+- Engineer decision: Move reusable assertion methods for
+  `TransactionDeduplicator` into an `Extensions` directory in the test
+  project and implement them as extension methods on the deduplicator.
+- Affected work: Test helpers, test project organization, and coding skill.
+- Status: Active.
+
+### C-046 - Share common test state through a base class
+
+- Recorded at: 2026-10-18T00:46:07+02:00
+- Decision time: 2026-10-18T00:46:07+02:00
+- Context/question: `SingleTransactionTests` and
+  `MultipleTransactionTests` duplicate the options, fake clock, and lazy
+  system-under-test property.
+- Engineer decision: Extract the common test state into an abstract
+  `BaseTransactionDeduplicatorTest` class and have both scenario classes
+  inherit from it.
+- Affected work: Test class structure and coding skill.
+- Status: Active.

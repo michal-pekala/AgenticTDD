@@ -1,27 +1,13 @@
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using TransactionDeduplicator.Pilot;
-using Deduplicator = TransactionDeduplicator.Pilot.TransactionDeduplicator;
 using Error = TransactionDeduplicator.Pilot.ValidationError;
-using TransactionDeduplicator.Tests.Fixture;
+using TransactionDeduplicator.Tests.Extensions;
 
 namespace TransactionDeduplicator.Tests;
 
-public sealed class SingleTransactionTests
+public sealed class SingleTransactionTests : BaseTransactionDeduplicatorTest
 {
-    private readonly FakeDateTimeProvider _dateTimeProvider = new();
-    private readonly TransactionDeduplicatorOptions _options = new();
-    private Deduplicator? _sut;
-
-    private Deduplicator Sut
-        => _sut ??= new Deduplicator(_dateTimeProvider, _options);
-
-    private DateTimeOffset Now
-    {
-        get => _dateTimeProvider.Now;
-        set => _dateTimeProvider.Now = value;
-    }
-
     [Fact]
     public void New_transaction_can_be_processed()
         => Sut
@@ -106,7 +92,8 @@ public sealed class SingleTransactionTests
     {
         _options.UniqnessCheckExpiration = TimeSpan.Zero;
 
-        AssertInvalidOptionIsRejected(
+        Sut.AssertException<ArgumentOutOfRangeException>(
+            Guid.NewGuid().ToString(),
             Error.InvalidUniqnessCheckExpiration.Format(_options.UniqnessCheckExpiration));
     }
 
@@ -117,34 +104,8 @@ public sealed class SingleTransactionTests
     {
         _options.UniqnessBufferCapacity = capacity;
 
-        AssertInvalidOptionIsRejected(
+        Sut.AssertException<ArgumentOutOfRangeException>(
+            Guid.NewGuid().ToString(),
             Error.InvalidUniqnessBufferCapacity.Format(_options.UniqnessBufferCapacity));
     }
-
-    [Fact]
-    public void New_transaction_is_rejected_when_capacity_is_full()
-    {
-        _options.UniqnessBufferCapacity = 1;
-        var activeTransactionId = Guid.NewGuid().ToString();
-        var newTransactionId = Guid.NewGuid().ToString();
-
-        Sut.IsUniqueAndProcess(activeTransactionId)
-            .Should().BeTrue();
-
-        FluentActions
-            .Invoking(() => Sut.IsUniqueAndProcess(newTransactionId))
-            .Should().Throw<CapacityExceededException>()
-            .Which.Message.Should()
-            .Be(Error.CapacityExceeded.Format(_options.UniqnessBufferCapacity));
-
-        Sut.IsUniqueAndProcess(activeTransactionId)
-            .Should().BeFalse();
-    }
-
-    private void AssertInvalidOptionIsRejected(string expectedErrorMessage)
-        => FluentActions
-            .Invoking(() => Sut.IsUniqueAndProcess(Guid.NewGuid().ToString()))
-            .Should().Throw<ArgumentOutOfRangeException>()
-            .Which.Message.Should()
-            .Be(expectedErrorMessage);
 }

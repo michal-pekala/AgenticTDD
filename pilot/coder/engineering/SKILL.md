@@ -190,6 +190,9 @@ to the coder log and update this section without deleting the history.
 - Prefer small, meaningfully named extension methods when they replace
   unreadable constructions with unrelated parameters. Optimize call sites for
   clear intent and readability while keeping the helper behavior focused.
+- Put reusable `TransactionDeduplicator` test assertion extensions under the
+  test project's `Extensions` directory and expose them as extension methods
+  on the system under test (for example, `Sut.AssertException<TException>(...)`).
 - When multiple option checks share the same validation shape, use a focused
   generic helper that accepts the option value, a `Func<T, bool>` validity
   condition, and an error-message template. Format the template with the value
@@ -197,7 +200,9 @@ to the coder log and update this section without deleting the history.
   validation exception.
 - Group tests by scenario size: use `SingleTransactionTests` for single-ID
   behavior, then introduce clearly named test classes for multiple-ID
-  scenarios as coverage grows.
+  scenarios as coverage grows. When these classes share the same options,
+  fake clock, and lazy `Sut`, extract them into
+  `BaseTransactionDeduplicatorTest` rather than duplicating the properties.
 - Benchmark global-lock and ConcurrentDictionary variants with multiple
   threads. Start with small pilot runs and measure memory as well as
   performance, then scale up.
