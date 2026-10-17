@@ -23,6 +23,8 @@ public sealed class TransactionDeduplicator
 
     public bool IsUniqueAndProcess(string transactionId)
     {
+        ValidateOptions();
+
         var parsedTransactionId = ParseTransactionId(transactionId);
         var currentTime = _dateTimeProvider.CurrentTime;
 
@@ -33,6 +35,18 @@ public sealed class TransactionDeduplicator
         _transactions[parsedTransactionId] = currentTime;
 
         return !isActiveDuplicate;
+    }
+
+    private void ValidateOptions()
+    {
+        if (_options.UniqnessCheckExpiration <= TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(
+                paramName: null,
+                message:
+                ValidationError.InvalidUniqnessCheckExpiration.Format(
+                    _options.UniqnessCheckExpiration));
+        }
     }
 
     private static Guid ParseTransactionId(string transactionId)
