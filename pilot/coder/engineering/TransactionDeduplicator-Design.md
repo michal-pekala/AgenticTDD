@@ -19,7 +19,9 @@ Non-positive expiration validation has completed RED and GREEN; the operation
 reports an `ArgumentOutOfRangeException` with the configured value in its
 message before processing the transaction. No additional REFACTOR was
 warranted because the validation is already isolated in `ValidateOptions`.
-Non-positive capacity validation now has a focused RED test.
+Non-positive capacity validation has completed RED and GREEN; zero and
+negative values are rejected on the operation path with the configured value
+in the full exception message.
 No REFACTOR commit was needed for basic duplicate detection; eager dictionary
 initialization is retained because its small allocation is acceptable. The
 expiry test fake is shared from the test `Fixture` directory, and

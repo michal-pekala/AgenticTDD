@@ -47,6 +47,15 @@ public sealed class TransactionDeduplicator
                 ValidationError.InvalidUniqnessCheckExpiration.Format(
                     _options.UniqnessCheckExpiration));
         }
+
+        if (_options.UniqnessBufferCapacity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                paramName: null,
+                message:
+                ValidationError.InvalidUniqnessBufferCapacity.Format(
+                    _options.UniqnessBufferCapacity));
+        }
     }
 
     private static Guid ParseTransactionId(string transactionId)
