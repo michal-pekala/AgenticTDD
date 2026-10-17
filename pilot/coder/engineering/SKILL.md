@@ -166,6 +166,8 @@ to the coder log and update this section without deleting the history.
   `.Should().BeTrue()` on one line.
 - In implementation methods, separate logically distinct statements with a
   blank line to make the steps easier to scan.
+- In tests, put a blank line after option setup. Keep consecutive local
+  variable declarations together without blank lines between them.
 - Prefer expression-bodied methods for one-line implementations when it keeps
   the method clear; this applies generally, including private test helpers.
 - Name tests for the behavior they demonstrate, without claims the test does

@@ -748,3 +748,15 @@ identified.
   inherit from it.
 - Affected work: Test class structure and coding skill.
 - Status: Active.
+
+### C-047 - Separate test options from variable declarations
+
+- Recorded at: 2026-10-18T12:35:58+02:00
+- Decision time: 2026-10-18T12:35:58+02:00
+- Context/question: Test setup is easier to scan when option configuration
+  is visually separated from local variable declarations.
+- Engineer decision: In tests, put a blank line after option assignments.
+  Keep consecutive local variable declarations together without blank lines
+  between them.
+- Affected work: Test formatting and coding skill.
+- Status: Active.
