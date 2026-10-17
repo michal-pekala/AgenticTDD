@@ -4,7 +4,7 @@ namespace TransactionDeduplicator.Pilot;
 
 public sealed class TransactionDeduplicator
 {
-    private readonly ConcurrentDictionary<Guid, byte> _transactions = new();
+    private readonly ConcurrentDictionary<Guid, DateTimeOffset> _transactions = new();
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly TransactionDeduplicatorOptions _options;
 
@@ -24,7 +24,41 @@ public sealed class TransactionDeduplicator
     public bool IsUniqueAndProcess(string transactionId)
     {
         var parsedTransactionId = ParseTransactionId(transactionId);
-        return _transactions.TryAdd(parsedTransactionId, 0);
+
+        while (true)
+        {
+            var currentTime = _dateTimeProvider.CurrentTime;
+            if (_transactions.TryAdd(parsedTransactionId, currentTime))
+            {
+                return true;
+            }
+
+            if (!_transactions.TryGetValue(parsedTransactionId, out var lastAttempt))
+            {
+                continue;
+            }
+
+            currentTime = _dateTimeProvider.CurrentTime;
+            if (currentTime >= lastAttempt + _options.UniqnessCheckExpiration)
+            {
+                var expiredEntry = new KeyValuePair<Guid, DateTimeOffset>(
+                    parsedTransactionId,
+                    lastAttempt);
+
+                if (((ICollection<KeyValuePair<Guid, DateTimeOffset>>)_transactions)
+                    .Remove(expiredEntry))
+                {
+                    continue;
+                }
+
+                continue;
+            }
+
+            if (_transactions.TryUpdate(parsedTransactionId, currentTime, lastAttempt))
+            {
+                return false;
+            }
+        }
     }
 
     private static Guid ParseTransactionId(string transactionId)

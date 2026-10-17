@@ -9,11 +9,11 @@ and REFACTOR commits. The malformed-ID validation has completed RED, GREEN,
 and REFACTOR; its parser now returns the normalized GUID for subsequent
 identity handling. Active-duplicate detection has completed RED and GREEN:
 GUIDs are registered in a concurrent dictionary, so repeats are rejected as
-duplicates. Duplicate refresh and exact-boundary expiration are now in RED,
-with an injected `IDateTimeProvider` test seam. No REFACTOR commit was needed
-for basic duplicate detection; eager dictionary initialization is retained
-because its small allocation is acceptable. Capacity and cleanup remain
-future tested stages. No benchmark project has been created yet.
+duplicates. Configurable duplicate refresh and exact-boundary expiration are
+now in GREEN using the injected `IDateTimeProvider`. No REFACTOR commit was
+needed for basic duplicate detection; eager dictionary initialization is
+retained because its small allocation is acceptable. Capacity and cleanup
+remain future tested stages. No benchmark project has been created yet.
 
 ## Approved acceptance basis
 
