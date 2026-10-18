@@ -30,29 +30,31 @@ public sealed class TransactionDeduplicator
         lock (_transactions)
         {
             var currentTime = _dateTimeProvider.CurrentTime;
-            var isActiveDuplicate =
-                _transactions.TryGetValue(parsedTransactionId, out var lastAttempt)
-                && currentTime < lastAttempt + _options.UniqnessCheckExpiration;
 
-            if (!isActiveDuplicate
-                && !_transactions.ContainsKey(parsedTransactionId)
-                && _transactions.Count >= _options.UniqnessBufferCapacity)
+            if (_transactions.TryGetValue(parsedTransactionId, out var lastAttempt))
             {
-                ReclaimExpiredTransactions(currentTime);
-
-                if (_transactions.Count < _options.UniqnessBufferCapacity)
+                if (currentTime < lastAttempt + _options.UniqnessCheckExpiration)
                 {
                     _transactions[parsedTransactionId] = currentTime;
 
-                    return true;
+                    return false;
                 }
 
+                _transactions[parsedTransactionId] = currentTime;
+
+                return true;
+            }
+
+            ReclaimExpiredTransactions(currentTime);
+
+            if (_transactions.Count >= _options.UniqnessBufferCapacity)
+            {
                 throw new CapacityExceededException(_options.UniqnessBufferCapacity);
             }
 
             _transactions[parsedTransactionId] = currentTime;
 
-            return !isActiveDuplicate;
+            return true;
         }
     }
 

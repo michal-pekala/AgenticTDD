@@ -36,7 +36,9 @@ The RED/GREEN/REFACTOR cycle is in progress; exception assertions in the
 single-transaction tests are consolidated through the shared SUT extension.
 Concurrent first calls for the same unseen transaction have completed RED
 and GREEN; dictionary reads, updates, reclamation, and capacity operations
-are synchronized together.
+are synchronized together. The REFACTOR step separates active duplicates,
+expired same-ID reacceptance, and unseen-ID reclamation/capacity handling into
+distinct paths.
 No REFACTOR commit was needed for basic duplicate detection; eager dictionary
 initialization is retained because its small allocation is acceptable. The
 expiry test fake is shared from the test `Fixture` directory, and
