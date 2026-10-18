@@ -36,12 +36,32 @@ public sealed class TransactionDeduplicator
             && !_transactions.ContainsKey(parsedTransactionId)
             && _transactions.Count >= _options.UniqnessBufferCapacity)
         {
+            ReclaimExpiredTransactions(currentTime);
+
+            if (_transactions.Count < _options.UniqnessBufferCapacity)
+            {
+                _transactions[parsedTransactionId] = currentTime;
+
+                return true;
+            }
+
             throw new CapacityExceededException(_options.UniqnessBufferCapacity);
         }
 
         _transactions[parsedTransactionId] = currentTime;
 
         return !isActiveDuplicate;
+    }
+
+    private void ReclaimExpiredTransactions(DateTimeOffset currentTime)
+    {
+        foreach (var transaction in _transactions)
+        {
+            if (currentTime >= transaction.Value + _options.UniqnessCheckExpiration)
+            {
+                _transactions.TryRemove(transaction.Key, out _);
+            }
+        }
     }
 
     private void ValidateOptions()

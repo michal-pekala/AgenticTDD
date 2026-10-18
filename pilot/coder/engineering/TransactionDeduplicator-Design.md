@@ -27,6 +27,9 @@ rejected with `CapacityExceededException` when the tracked entry count is at
 capacity, while an existing active duplicate is still processed first. Its
 test is grouped in `MultipleTransactionTests`, which shares options, fake
 time, and the lazy system under test through `BaseTransactionDeduplicatorTest`.
+Expired-entry reclamation before capacity enforcement has completed RED and
+GREEN through a synchronous scan when the collection is at capacity; exact
+expiry-boundary entries are reclaimed before an unseen transaction is added.
 No REFACTOR commit was needed for basic duplicate detection; eager dictionary
 initialization is retained because its small allocation is acceptable. The
 expiry test fake is shared from the test `Fixture` directory, and
