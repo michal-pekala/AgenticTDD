@@ -14,7 +14,9 @@ implemented using the injected `IDateTimeProvider`. Duplicate expiration
 refresh has completed RED, GREEN, and REFACTOR per C-044; timestamp storage
 is shared across the active-duplicate and new/expired-ID paths. Expiry
 handling uses direct dictionary lookup; synchronization is explicitly
-deferred as requested and remains an unresolved acceptance gap.
+serialized on the existing dictionary instance to ensure concurrent
+first-seen calls are accepted only once. The locking approach is a simple
+correctness implementation; throughput remains unmeasured.
 Non-positive expiration validation has completed RED and GREEN; the operation
 reports an `ArgumentOutOfRangeException` with the configured value in its
 message before processing the transaction. The REFACTOR step extracted the
@@ -32,6 +34,9 @@ GREEN through a synchronous scan when the collection is at capacity; exact
 expiry-boundary entries are reclaimed before an unseen transaction is added.
 The RED/GREEN/REFACTOR cycle is in progress; exception assertions in the
 single-transaction tests are consolidated through the shared SUT extension.
+Concurrent first calls for the same unseen transaction have completed RED
+and GREEN; dictionary reads, updates, reclamation, and capacity operations
+are synchronized together.
 No REFACTOR commit was needed for basic duplicate detection; eager dictionary
 initialization is retained because its small allocation is acceptable. The
 expiry test fake is shared from the test `Fixture` directory, and

@@ -26,31 +26,34 @@ public sealed class TransactionDeduplicator
         ValidateOptions();
 
         var parsedTransactionId = ParseTransactionId(transactionId);
-        var currentTime = _dateTimeProvider.CurrentTime;
 
-        var isActiveDuplicate =
-            _transactions.TryGetValue(parsedTransactionId, out var lastAttempt)
-            && currentTime < lastAttempt + _options.UniqnessCheckExpiration;
-
-        if (!isActiveDuplicate
-            && !_transactions.ContainsKey(parsedTransactionId)
-            && _transactions.Count >= _options.UniqnessBufferCapacity)
+        lock (_transactions)
         {
-            ReclaimExpiredTransactions(currentTime);
+            var currentTime = _dateTimeProvider.CurrentTime;
+            var isActiveDuplicate =
+                _transactions.TryGetValue(parsedTransactionId, out var lastAttempt)
+                && currentTime < lastAttempt + _options.UniqnessCheckExpiration;
 
-            if (_transactions.Count < _options.UniqnessBufferCapacity)
+            if (!isActiveDuplicate
+                && !_transactions.ContainsKey(parsedTransactionId)
+                && _transactions.Count >= _options.UniqnessBufferCapacity)
             {
-                _transactions[parsedTransactionId] = currentTime;
+                ReclaimExpiredTransactions(currentTime);
 
-                return true;
+                if (_transactions.Count < _options.UniqnessBufferCapacity)
+                {
+                    _transactions[parsedTransactionId] = currentTime;
+
+                    return true;
+                }
+
+                throw new CapacityExceededException(_options.UniqnessBufferCapacity);
             }
 
-            throw new CapacityExceededException(_options.UniqnessBufferCapacity);
+            _transactions[parsedTransactionId] = currentTime;
+
+            return !isActiveDuplicate;
         }
-
-        _transactions[parsedTransactionId] = currentTime;
-
-        return !isActiveDuplicate;
     }
 
     private void ReclaimExpiredTransactions(DateTimeOffset currentTime)
