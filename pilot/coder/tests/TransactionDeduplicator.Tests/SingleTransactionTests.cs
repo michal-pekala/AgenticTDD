@@ -19,10 +19,9 @@ public sealed class SingleTransactionTests : BaseTransactionDeduplicatorTest
     {
         var invalidId = $"not-a-guid-{Guid.NewGuid()}";
 
-        FluentActions
-            .Invoking(() => Sut.IsUniqueAndProcess(invalidId))
-            .Should().Throw<ArgumentException>()
-            .WithMessage(Error.InvalidTransactionId.Format(invalidId));
+        Sut.AssertException<ArgumentException>(
+            invalidId,
+            Error.InvalidTransactionId.Format(invalidId));
     }
 
     [Fact]

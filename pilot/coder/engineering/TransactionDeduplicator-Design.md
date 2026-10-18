@@ -30,6 +30,8 @@ time, and the lazy system under test through `BaseTransactionDeduplicatorTest`.
 Expired-entry reclamation before capacity enforcement has completed RED and
 GREEN through a synchronous scan when the collection is at capacity; exact
 expiry-boundary entries are reclaimed before an unseen transaction is added.
+The RED/GREEN/REFACTOR cycle is in progress; exception assertions in the
+single-transaction tests are consolidated through the shared SUT extension.
 No REFACTOR commit was needed for basic duplicate detection; eager dictionary
 initialization is retained because its small allocation is acceptable. The
 expiry test fake is shared from the test `Fixture` directory, and

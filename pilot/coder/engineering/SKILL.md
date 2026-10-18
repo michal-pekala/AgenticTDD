@@ -195,6 +195,8 @@ to the coder log and update this section without deleting the history.
 - Put reusable `TransactionDeduplicator` test assertion extensions under the
   test project's `Extensions` directory and expose them as extension methods
   on the system under test (for example, `Sut.AssertException<TException>(...)`).
+  When introducing a shared assertion, search and migrate all existing
+  matching assertions so tests use the common helper consistently.
 - When multiple option checks share the same validation shape, use a focused
   generic helper that accepts the option value, a `Func<T, bool>` validity
   condition, and an error-message template. Format the template with the value
