@@ -28,7 +28,7 @@ Configuration
 - UniqnessBufferCapacity is configurable and defaults to 1M active transaction
   IDs.
 - Configuration values must be positive. Invalid configuration must be
-  reported clearly from an operation call before it changes state.
+  reported clearly during component configuration or construction.
 
 Acceptance criteria
 -------------------
@@ -63,10 +63,14 @@ Acceptance criteria
    The number of retained active transaction IDs must not exceed
    UniqnessBufferCapacity.
    When a valid, previously unseen ID arrives and capacity is full after
-   expired IDs have been reclaimed, the ID is not accepted and active state
-   does not change.
+   expired IDs have been reclaimed, the new ID is not accepted and the active
+   transaction state remains unchanged.
    A duplicate of an active ID is still identified and returns false when the
    buffer is at capacity.
+   The caller must be able to distinguish a capacity rejection from a
+   successfully processed ID or a duplicate. The mechanism for communicating
+   this outcome is an API/design decision, not a business acceptance
+   criterion; see the behavior-decision log.
 
 7. Thread safety
    Concurrent calls are safe. If multiple calls for the same previously
@@ -98,15 +102,6 @@ Acceptance criteria
     duration, achieved throughput, and relevant latency results. The
     benchmark must make clear whether it meets the 100,000 calls/second
     target; do not claim the target is met without measured results.
-
-Approved API/design decisions (not business acceptance criteria)
-----------------------------------------------------------------
-
-- D-002 in the behavior-decision log remains an approved API/design decision:
-  capacity exhaustion for a new ID uses a dedicated
-  `CapacityExceededException`, not `OutOfMemoryException`. This mechanism is
-  not part of criterion 6; the coding design must carry and confirm it
-  separately.
 
 Out of scope
 ------------

@@ -25,14 +25,12 @@ When configuring an agent, explicitly make this skill available to it.
 - Check whether requested guarantees are compatible. State material
   limitations plainly; do not claim guarantees that the described scope cannot
   provide.
-- Keep acceptance criteria at the observable business/system behavior level.
-  Do not prescribe technical or API mechanisms (such as exception types,
-  method signatures, data structures, algorithms, frameworks, or
-  architecture), even when an engineer separately approves such a choice.
-  Record approved technical/API choices in the decision log and a distinct
-  design/API-constraints section, not as business acceptance criteria. Hand
-  meaningful design choices to the coding agent for a proposal and engineer
-  approval.
+- Keep technical/API choices (data structures, algorithms, frameworks,
+  architecture, exception types, and result shapes) out of business
+  acceptance criteria. Record explicit engineer decisions about these choices
+  in the decision log and hand them to the coding agent as design constraints,
+  distinct from behavioral requirements. The coding agent should surface them
+  in its design proposal for confirmation where appropriate.
 - Before presenting criteria as approved, verify that every material
   ambiguity is resolved or clearly marked as an open question requiring
   approval.
@@ -83,14 +81,10 @@ Produce a concise, structured handoff containing:
   approved requirements.
 - References to the behavior-decision log entries that support important
   decisions.
-- Any approved technical or API decisions that constrain implementation,
-  separated from and clearly labeled as not being business acceptance
-  criteria.
 
 Do not label a criterion approved when it depends on an unresolved decision.
-Do not turn an approved technical/API decision into a behavioral criterion.
-Cross-reference it separately so the coding agent can honor the constraint
-without confusing it with required business behavior.
+Do not prescribe how the coding agent must implement a criterion unless that
+implementation choice is itself an explicit requirement.
 
 ## Final consistency check
 
@@ -102,4 +96,6 @@ Before handing off, confirm that:
 - Exact boundaries, units, defaults, and error outcomes are stated where
   necessary to make tests deterministic.
 - Performance claims include a measurable workload and verification plan.
-- Design recommendations are not presented as behavioral requirements.
+- Technical/API decisions and design recommendations are not presented as
+  business behavioral requirements; approved technical decisions remain
+  visible to the coding agent through the decision log.

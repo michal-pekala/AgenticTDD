@@ -24,10 +24,11 @@ retrospective; no exact historical decision times are inferred.
 - Context/question: Exact deduplication with bounded memory needs behavior
   when the configured maximum is reached; deliberately throwing
   `OutOfMemoryException` would misrepresent runtime memory exhaustion.
-- Engineer decision: Throw a dedicated `CapacityExceededException` for a new
-  ID when capacity is full. Do not throw `OutOfMemoryException`.
-- Affected criteria: Capacity limit; API error behavior.
-- Status: Active
+- Engineer decision: Use a dedicated `CapacityExceededException` for a new ID
+  when capacity is full. Do not throw `OutOfMemoryException`.
+- Affected area: API/design behavior when capacity is exhausted.
+- Status: Active as an API/design decision; not a business acceptance
+  criterion. See D-012.
 
 ### D-003 - Capacity is configurable and measured
 
@@ -131,6 +132,21 @@ retrospective; no exact historical decision times are inferred.
 - Affected criteria: Performance and bounded memory; performance verification.
 - Status: Active
 
+### D-012 - Keep technical API choices out of business acceptance criteria
+
+- Recorded at: 2026-10-15T14:15:21+02:00
+- Decision time: 2026-10-15T14:15:21+02:00
+- Context/question: The capacity criterion specified a particular exception
+  type, which is an API/technical choice rather than business behavior.
+- Engineer decision: Business acceptance criteria describe the outcome:
+  reject a new unseen ID at capacity without changing active state, while
+  continuing to recognize active duplicates. Keep the mechanism for
+  communicating capacity rejection out of business criteria. Preserve D-002
+  as a separately recorded API/design decision for the coding agent.
+- Affected criteria: Capacity limit; analyst handoff responsibilities.
+- Status: Active; D-002 remains a design/API decision, not an acceptance
+  criterion.
+
 ## Consistency review
 
 These entries were backfilled from the pilot discussion. D-003 and D-009 are
@@ -142,45 +158,6 @@ O(1); it does not prescribe a data structure, consistent with D-010.
 No unresolved contradiction was identified in the recorded decisions at the
 time this log was created. Re-check the relevant sequence whenever a new
 explicit engineer decision is added and before publishing revised acceptance
-criteria.
-
-### D-012 - Capacity behavior criteria exclude API mechanism
-
-- Recorded at: 2026-10-15T14:17:36+02:00
-- Decision time: Not captured (retrospective)
-- Context/question: The analyst handoff described capacity exhaustion by
-  naming `CapacityExceededException`, which prescribes a technical/API
-  mechanism instead of stating only the required behavior.
-- Engineer decision: Keep D-002 in the decision history as an approved
-  API/design decision requiring a dedicated capacity exception, but do not
-  make the exception type a business acceptance criterion. Criterion 6 must
-  state that an unseen ID is not accepted and active state is unchanged after
-  expiry reclamation; active duplicates remain recognized. The analyst skill
-  must keep approved technical/API decisions separate from behavioral
-  criteria.
-- Affected criteria: Capacity limit (criterion 6); analyst skill guidance;
-  coder design handoff.
-- Status: Active; refines the classification of D-002 without deleting or
-  reversing its approved API/design constraint.
-
-### D-013 - Invalid configuration is reported on the operation path
-
-- Recorded at: 2026-10-15T14:17:36+02:00
-- Decision time: Not captured (retrospective)
-- Context/question: The prior handoff allowed invalid configuration to be
-  reported during configuration or construction, while the engineer requires
-  constructors to avoid throwing and configuration errors to surface during
-  execution.
-- Engineer decision: Configuration values remain required to be positive;
-  invalid configuration is reported clearly from an operation call before
-  state changes. The constructor must not throw for invalid configuration.
-- Affected criteria: Configuration; constructor and operation behavior.
-- Status: Active; refines invalid-configuration error timing.
-
-## Consistency review after D-012 and D-013
-
-D-012 does not remove D-002: the dedicated exception remains an approved
-API/design constraint, distinct from business acceptance criterion 6.
-D-013 changes the handoff's invalid-configuration timing to the operation
-path while preserving positive-value validation. The revised handoff and
-analyst skill reflect both decisions; no unresolved contradiction remains.
+criteria. D-012 clarifies that D-002 specifies an approved API/design choice,
+while the business acceptance criterion states only the capacity behavior and
+outcome; these apply at distinct layers and do not conflict.
