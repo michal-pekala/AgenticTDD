@@ -207,6 +207,21 @@ to the coder log and update this section without deleting the history.
   scenarios as coverage grows. When these classes share the same options,
   fake clock, and lazy `Sut`, extract them into
   `BaseTransactionDeduplicatorTest` rather than duplicating the properties.
+- For concurrent-operation tests, create concurrent invocations as tasks from
+  a `Func<T>` using a generic helper:
+
+  ```csharp
+  private static Task<T[]> RunConcurrent<T>(Func<T> func, int concurrentCalls = 16)
+      => Task.WhenAll(Enumerable
+          .Range(0, concurrentCalls)
+          .Select(_ => Task.Run(func)));
+  ```
+
+  Return `Task.WhenAll(...)` directly without `async`/`await` in the helper.
+  Await the helper in the test and assert the returned results directly. With
+  the current FluentAssertions version, use
+  `.ContainSingle(result => result)` to assert exactly one `true`; passing a
+  boolean directly is not a supported overload.
 - Benchmark global-lock and ConcurrentDictionary variants with multiple
   threads. Start with small pilot runs and measure memory as well as
   performance, then scale up.

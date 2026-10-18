@@ -760,3 +760,21 @@ identified.
   between them.
 - Affected work: Test formatting and coding skill.
 - Status: Active.
+
+### C-048 - Keep concurrent tests concise and task-based
+
+- Recorded at: 2026-10-18T13:18:03+02:00
+- Decision time: 2026-10-18T13:18:03+02:00
+- Context/question: The initial concurrency test used manual threads, gates,
+  counters, and loops, obscuring the behavior being tested.
+- Engineer decision: Express concurrent invocations as tasks and collect
+  their values with `Task.WhenAll`. Extract task creation and collection into
+  a generic `RunConcurrent<T>(Func<T> func, int concurrentCalls = 16)` helper
+  that returns `Task<T[]>` directly without `async`/`await`. Format the
+  expression as `Task.WhenAll(Enumerable` with `.Range(...)` and `.Select(...)`
+  each on their own following line. Await the helper in the test and assert
+  the returned values directly using
+  `.ContainSingle(result => result)` for exactly one `true`; a direct boolean
+  argument is unsupported by the current FluentAssertions version.
+- Affected work: Concurrent test readability and coding skill.
+- Status: Active.
