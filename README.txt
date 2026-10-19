@@ -27,9 +27,9 @@ Goals
 Initial workflow
 ----------------
 
-Begin with a task analyst, three coding agents (test writer, implementer,
-refactorer) run by a controller session, and an independent quality
-reviewer. The engineer approves decisions and every commit.
+Begin with a task analyst, an architect, three coding agents (test writer,
+implementer, refactorer) run by a controller session, and an independent
+quality reviewer. The engineer approves decisions and every commit.
 Use deterministic workflow logic for status, deadlines, retries, and routing
 where practical; these concerns do not require an always-running AI agent.
 
@@ -49,6 +49,9 @@ Roles
        possible; escalates stalled or unrecoverable work to an engineer.
 
 2. Task analyst
+   - Today: a Claude Code session started with `/tdd-analyst`
+     (`.claude/skills/tdd-analyst/`). It reuses earlier engineer decisions
+     for the same problem and asks only about what they do not settle.
    - Clarifies the customer's goal, scope, terminology, and unanswered
      questions before implementation.
    - Produces observable, independently verifiable acceptance criteria.
@@ -58,7 +61,18 @@ Roles
    - Does not prescribe implementation details unless the customer explicitly
      requires them.
 
-3. Coding agents
+3. Architect
+   - Today: a Claude Code session started with `/tdd-architect`
+     (`.claude/skills/tdd-architect/`).
+   - Turns approved acceptance criteria into a design document and an
+     engineering decision log, one decision at a time with the engineer,
+     reusing earlier engineer decisions for the same problem.
+   - Proposes options with tradeoffs and a recommendation; does not claim
+     performance benefits without measurements.
+   - After design approval, scaffolds the empty solution and projects. Writes
+     no production behavior or tests.
+
+4. Coding agents
    Three Claude Code subagents (`.claude/agents/`), each with its own
    context, sharing the rules in `.claude/skills/tdd-common-rules/`:
    - Test writer (RED): writes the failing test for one criterion, with
@@ -72,7 +86,7 @@ Roles
      propose guidance updates; the controller applies approved changes in a
      separate commit.
 
-4. Quality reviewer (no agent yet)
+5. Quality reviewer (no agent yet)
    - Independently checks the implementation and tests against the approved
      acceptance criteria.
    - Verifies that tests assert required behavior, including relevant edge
@@ -92,9 +106,11 @@ Delivery process
 1. Intake: The analyst asks questions, records scope and assumptions, and
    drafts acceptance criteria. The engineer resolves open decisions and
    approves the criteria before coding begins.
-2. Design: For decisions with meaningful tradeoffs, the coding agent presents
-   an implementation proposal. The engineer approves it before implementation.
-3. Red: The coding agent adds focused tests in the test project for one
+2. Design: The architect turns the approved criteria into a design, asking the
+   engineer about each decision with meaningful tradeoffs. The engineer
+   approves the design before implementation; the architect then scaffolds
+   the empty solution.
+3. Red: The test writer adds focused tests in the test project for one
    approved criterion and runs them to verify they fail for the intended
    reason. Do not leave a shared branch broken solely to preserve a RED-stage
    commit. Pilot exception: during pilots, RED is committed on its own so
@@ -106,7 +122,7 @@ Delivery process
    while keeping the suite green. Avoid abstractions that do not serve the
    requirements.
 6. Review: The independent reviewer checks the change against the approved
-   criteria and quality gates. The coding agent addresses feedback in a
+   criteria and quality gates. The coding agents address feedback in a
    bounded revision loop; escalate persistent disagreements to the engineer.
 7. Repeat: After approval, proceed to the next criterion. The engineer reviews
    the complete change before merge.
@@ -137,7 +153,7 @@ Quality principles
 - Consider branch coverage or mutation testing when they add useful evidence.
 - Prefer readable production code and tests over verbosity or unnecessary
   abstractions.
-- Use an independent reviewer; a different model from the coding agent may
+- Use an independent reviewer; a different model from the coding agents may
   help reduce shared blind spots.
 - Record engineer decisions as project guidance. Changes to agent instructions
   or skills are proposals until reviewed and approved.
@@ -172,8 +188,11 @@ Pilot and success measures
 Open questions
 --------------
 
-- Next step: run pilot 2 with the three coding agents and the controller,
-  on a new, small problem with no performance requirement.
+- Next step: pilot 2 reruns the TransactionDeduplicator task from analysis
+  onward in `pilot/TransactionDeduplicator/pilot2/`, with the analyst,
+  architect, controller, and coding agents, reusing pilot 1's engineer
+  decisions. Its performance criteria wait for the benchmark ownership
+  decision below.
 - Benchmark ownership (deferred until a problem needs one). Options: the
   test writer writes the benchmark and target check and the implementer
   optimizes; a fourth performance agent owns benchmarks and reports; or the

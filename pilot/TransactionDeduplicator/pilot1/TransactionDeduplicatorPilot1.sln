@@ -13,8 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionDeduplicatorPilo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engineering", "engineering", "{4A7B2A5C-67CA-4D8B-B98A-EE819FFAD8D2}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\engineering\TransactionDeduplicator-Design.md = ..\..\engineering\TransactionDeduplicator-Design.md
-		..\..\engineering\engineering-decisions.md = ..\..\engineering\engineering-decisions.md
+		engineering\TransactionDeduplicator-Design.md = engineering\TransactionDeduplicator-Design.md
+		engineering\engineering-decisions.md = engineering\engineering-decisions.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".claude", ".claude", "{B566C6EE-5E67-4BC3-9D9F-5583B831EDF9}"
@@ -36,6 +36,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tdd-controller", "tdd-controller", "{A507AE4B-AA9E-46F5-A5CC-2107009C90D6}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\..\.claude\skills\tdd-controller\SKILL.md = ..\..\..\.claude\skills\tdd-controller\SKILL.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tdd-analyst", "tdd-analyst", "{AAB92B49-7183-456E-B415-FF31666E084E}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\.claude\skills\tdd-analyst\SKILL.md = ..\..\..\.claude\skills\tdd-analyst\SKILL.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tdd-architect", "tdd-architect", "{030242C5-B411-4EC2-95F0-8758F8E1C9A7}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\.claude\skills\tdd-architect\SKILL.md = ..\..\..\.claude\skills\tdd-architect\SKILL.md
 	EndProjectSection
 EndProject
 Global
@@ -83,5 +93,7 @@ Global
 		{825924F1-8BE7-448E-8C16-9E05627743FA} = {B566C6EE-5E67-4BC3-9D9F-5583B831EDF9}
 		{E4EF1067-D1BC-46C4-9265-EEC89AE896E2} = {825924F1-8BE7-448E-8C16-9E05627743FA}
 		{A507AE4B-AA9E-46F5-A5CC-2107009C90D6} = {825924F1-8BE7-448E-8C16-9E05627743FA}
+		{AAB92B49-7183-456E-B415-FF31666E084E} = {825924F1-8BE7-448E-8C16-9E05627743FA}
+		{030242C5-B411-4EC2-95F0-8758F8E1C9A7} = {825924F1-8BE7-448E-8C16-9E05627743FA}
 	EndGlobalSection
 EndGlobal
