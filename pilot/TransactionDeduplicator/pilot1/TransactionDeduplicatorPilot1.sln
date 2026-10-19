@@ -33,6 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tdd-common-rules", "tdd-com
 		..\..\..\.claude\skills\tdd-common-rules\SKILL.md = ..\..\..\.claude\skills\tdd-common-rules\SKILL.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tdd-controller", "tdd-controller", "{A507AE4B-AA9E-46F5-A5CC-2107009C90D6}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\.claude\skills\tdd-controller\SKILL.md = ..\..\..\.claude\skills\tdd-controller\SKILL.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,5 +82,6 @@ Global
 		{28D6D0A1-C2D9-4CE3-8F01-56038AF8316E} = {B566C6EE-5E67-4BC3-9D9F-5583B831EDF9}
 		{825924F1-8BE7-448E-8C16-9E05627743FA} = {B566C6EE-5E67-4BC3-9D9F-5583B831EDF9}
 		{E4EF1067-D1BC-46C4-9265-EEC89AE896E2} = {825924F1-8BE7-448E-8C16-9E05627743FA}
+		{A507AE4B-AA9E-46F5-A5CC-2107009C90D6} = {825924F1-8BE7-448E-8C16-9E05627743FA}
 	EndGlobalSection
 EndGlobal
