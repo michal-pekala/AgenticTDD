@@ -5,17 +5,47 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionDeduplicator", "src\TransactionDeduplicator\TransactionDeduplicator.csproj", "{2C63CBE8-EEF9-43E1-BE03-41489C9EF6A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionDeduplicatorPilot1", "src\TransactionDeduplicatorPilot1.csproj", "{2C63CBE8-EEF9-43E1-BE03-41489C9EF6A9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionDeduplicator.Tests", "tests\TransactionDeduplicator.Tests\TransactionDeduplicator.Tests.csproj", "{4FEAE06F-F2AA-4D7F-82C2-FE271EF60497}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionDeduplicatorPilot1.Tests", "tests\TransactionDeduplicatorPilot1.Tests.csproj", "{4FEAE06F-F2AA-4D7F-82C2-FE271EF60497}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engineering", "engineering", "{4A7B2A5C-67CA-4D8B-B98A-EE819FFAD8D2}"
 	ProjectSection(SolutionItems) = preProject
-		engineering\SKILL.md = engineering\SKILL.md
 		engineering\TransactionDeduplicator-Design.md = engineering\TransactionDeduplicator-Design.md
 		engineering\engineering-decisions.md = engineering\engineering-decisions.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".claude", ".claude", "{B566C6EE-5E67-4BC3-9D9F-5583B831EDF9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "agents", "agents", "{28D6D0A1-C2D9-4CE3-8F01-56038AF8316E}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\.claude\agents\test-writer.md = ..\..\..\.claude\agents\test-writer.md
+		..\..\..\.claude\agents\implementer.md = ..\..\..\.claude\agents\implementer.md
+		..\..\..\.claude\agents\refactorer.md = ..\..\..\.claude\agents\refactorer.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "skills", "skills", "{825924F1-8BE7-448E-8C16-9E05627743FA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tdd-common-rules", "tdd-common-rules", "{E4EF1067-D1BC-46C4-9265-EEC89AE896E2}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\.claude\skills\tdd-common-rules\SKILL.md = ..\..\..\.claude\skills\tdd-common-rules\SKILL.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tdd-controller", "tdd-controller", "{A507AE4B-AA9E-46F5-A5CC-2107009C90D6}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\.claude\skills\tdd-controller\SKILL.md = ..\..\..\.claude\skills\tdd-controller\SKILL.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tdd-analyst", "tdd-analyst", "{AAB92B49-7183-456E-B415-FF31666E084E}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\.claude\skills\tdd-analyst\SKILL.md = ..\..\..\.claude\skills\tdd-analyst\SKILL.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tdd-architect", "tdd-architect", "{030242C5-B411-4EC2-95F0-8758F8E1C9A7}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\.claude\skills\tdd-architect\SKILL.md = ..\..\..\.claude\skills\tdd-architect\SKILL.md
 	EndProjectSection
 EndProject
 Global
@@ -59,5 +89,11 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{2C63CBE8-EEF9-43E1-BE03-41489C9EF6A9} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{4FEAE06F-F2AA-4D7F-82C2-FE271EF60497} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{28D6D0A1-C2D9-4CE3-8F01-56038AF8316E} = {B566C6EE-5E67-4BC3-9D9F-5583B831EDF9}
+		{825924F1-8BE7-448E-8C16-9E05627743FA} = {B566C6EE-5E67-4BC3-9D9F-5583B831EDF9}
+		{E4EF1067-D1BC-46C4-9265-EEC89AE896E2} = {825924F1-8BE7-448E-8C16-9E05627743FA}
+		{A507AE4B-AA9E-46F5-A5CC-2107009C90D6} = {825924F1-8BE7-448E-8C16-9E05627743FA}
+		{AAB92B49-7183-456E-B415-FF31666E084E} = {825924F1-8BE7-448E-8C16-9E05627743FA}
+		{030242C5-B411-4EC2-95F0-8758F8E1C9A7} = {825924F1-8BE7-448E-8C16-9E05627743FA}
 	EndGlobalSection
 EndGlobal
