@@ -1,5 +1,10 @@
 # Handoff: AgenticTDD pilot2 (from claude.ai chat to the Code session)
 
+> Lifetime (decided 2026-10-19): keep this file until the controller's
+> instructions exist. Then fold the open items (deferred decisions 2, 7, 8,
+> remaining plan steps, hooks idea) into them or the decision log, and
+> delete this file in the same commit.
+
 Read this first, then verify it against the actual repo files. This summary was
 written from a chat that could only read the repo through GitHub; the files on
 disk are the source of truth.
@@ -26,6 +31,19 @@ an agentic TDD ecosystem. Pilot2 is the vehicle for that learning. So:
   `pilot/coder/` (`TransactionDeduplicator.sln`, `src/`, `tests/`,
   `engineering/` with `SKILL.md` (~20 KB), `TransactionDeduplicator-Design.md`,
   `engineering-decisions.md`).
+- Layout change (2026-10-19, step 3 started): `pilot/coder/` and the old
+  coder `SKILL.md` are gone. `engineering/` moved to `pilot/engineering/`.
+  The customer task moved to
+  `pilot/TransactionDeduplicator/TransactionDeduplicator.txt`.
+  Pilot 1's code now lives in `pilot/TransactionDeduplicator/pilot1/`:
+  `TransactionDeduplicatorPilot1.sln`,
+  `src/TransactionDeduplicatorPilot1.csproj`,
+  `tests/TransactionDeduplicatorPilot1.Tests.csproj` (no per-project
+  subfolders)
+  (namespaces unchanged; `InternalsVisibleTo` updated). The solution has a
+  `.claude` solution folder (agents, skills) for review in Visual Studio.
+  Pilot 1's design doc and decision log still mention `pilot/coder/` paths;
+  they are left as history.
 - Existing workflow: analyst -> coder (RED, GREEN, optional REFACTOR) ->
   independent reviewer (described in README, no skill file yet). Append-only
   decision logs. Engineer approval after EVERY commit. Commit names:
@@ -125,7 +143,16 @@ an agentic TDD ecosystem. Pilot2 is the vehicle for that learning. So:
    Commits (2026-10-19): the agents commit their own stage ([RED], [GREEN],
    [REFACTOR]) and stop; the engineer reviews the commit and approves or
    rejects it. In the design session, the engineer still commits.
-   Drafted: `.claude/agents/test-writer.md`.
+   Drafted: `.claude/agents/test-writer.md`, `.claude/agents/implementer.md`,
+   `.claude/agents/refactorer.md`.
+   Guidance changes (2026-10-19): agents only propose; the controller
+   session applies approved changes in a commit of its own, never in a TDD
+   commit (pilot 1 put them in REFACTOR commits). Recorded in the common
+   skill's "Changing guidance" section.
+   For the refactorer draft: test renames are the refactorer's job (pilot 1
+   allowed them in GREEN, but the implementer may not touch `tests/`).
+   Conventions were also read from pilot 1's code, not only its old skill;
+   do the same for the refactorer.
 7. (Deferred to step 3, once the folder layout settles.) Where agents find
    the source-of-truth files: `common.md` names the acceptance criteria,
    `behaviour-decisions.md` and `engineering-decisions.md` but not their

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TransactionDeduplicator\TransactionDeduplicator.csproj" />
+    <ProjectReference Include="..\src\TransactionDeduplicatorPilot1.csproj" />
   </ItemGroup>
 
 </Project>

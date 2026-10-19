@@ -34,13 +34,17 @@ instructions and this file conflict, stop and ask the engineer.
 - When engineer feedback reveals a reusable rule, propose where it belongs:
   this file if it applies to every coding agent, otherwise the one agent
   file that needs it.
+- The controller session applies approved guidance changes in a commit of
+  its own. Never put a guidance change in a RED, GREEN, or REFACTOR commit.
 
 ## Repository boundaries
 
 - Work in the engineer's checkout on the active pilot branch. Do not
   create, switch, or delete branches without engineer approval.
-- Keep all coding artifacts under the pilot's `coder` directory; analyst
-  artifacts stay under `analyst`.
+- Keep code (solution, `src/`, `tests/`) in the pilot's code folder and
+  engineering documents under `engineering/`; analyst artifacts stay under
+  `analyst/`. Agent and shared-rule files live under `.claude/` at the
+  repository root.
 
 ## Behavior versus design
 
@@ -56,6 +60,17 @@ instructions and this file conflict, stop and ask the engineer.
 - Test observable behavior separately from the API contract that exposes
   it. For example, "a new item is rejected and state is unchanged" is one
   test; "the rejection throws a specific exception type" is another.
+
+## Code conventions
+
+- Put every extension-method class under an `Extensions/` directory, in
+  source and test projects alike.
+- Use `static` only for extension-method classes and constant-holder
+  classes (such as error message templates). Do not make other members
+  `static` just because they use no instance state.
+- Classes are `sealed` unless they are designed for inheritance.
+- Prefer expression-bodied members for one-line implementations, in
+  source and test code alike.
 
 ## Commits and approval gates
 
