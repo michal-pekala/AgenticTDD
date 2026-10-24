@@ -78,8 +78,8 @@ instructions and this file conflict, stop and ask the engineer.
   optional REFACTOR.
 - During the pilot, commit the failing RED test on its own, so the engineer
   can review the test before any implementation exists. This is a
-  pilot-only exception to the README's advice against leaving a branch
-  broken for a RED commit. The target workflow combines RED and GREEN in
+  pilot-only exception to the manifest's (`docs/MANIFEST.md`) advice
+  against leaving a branch broken for a RED commit. The target workflow combines RED and GREEN in
   one commit.
 - Commit subject: `<short behavior name> [RED]`, `[GREEN]` or `[REFACTOR]`.
   Use the same behavior name for every commit of a criterion.

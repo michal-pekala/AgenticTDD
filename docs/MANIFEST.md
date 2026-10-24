@@ -1,10 +1,8 @@
-Agentic TDD
-===========
+# Agentic TDD
 
 Project manifest
 
-Purpose
--------
+## Purpose
 
 Explore a reliable, human-supervised workflow in which AI agents help deliver
 software using test-driven development (TDD). The project begins with a small
@@ -14,8 +12,7 @@ produce correct, understandable, maintainable changes.
 The engineer remains accountable for product decisions, design approval,
 exceptions to quality gates, and final acceptance.
 
-Goals
------
+## Goals
 
 - Translate customer requests into clear, testable acceptance criteria.
 - Implement behavior incrementally using a red-green-refactor cycle.
@@ -24,8 +21,7 @@ Goals
 - Measure quality, iteration cost, and delivery performance before increasing
   agent autonomy.
 
-Initial workflow
-----------------
+## Initial workflow
 
 Begin with a task analyst, an architect, three coding agents (test writer,
 implementer, refactorer) run by a controller session, and an independent
@@ -33,75 +29,79 @@ quality reviewer. The engineer approves decisions and every commit.
 Use deterministic workflow logic for status, deadlines, retries, and routing
 where practical; these concerns do not require an always-running AI agent.
 
-Roles
------
+## Roles
 
-1. Controller
-   - Today: a Claude Code session started with `/tdd-controller`
-     (`.claude/skills/tdd-controller/`). It runs one criterion at a time
-     through the coding agents, verifies each commit, and stops for engineer
-     approval. It never writes production or test code itself.
-   - Later automation:
-     - Coordinates work and routes artifacts between roles.
-     - Tracks status, deadlines, retries, and blockers.
-     - Reports progress and pipeline issues.
-     - Uses deterministic automation for timers and state transitions where
-       possible; escalates stalled or unrecoverable work to an engineer.
+### 1. Controller
 
-2. Task analyst
-   - Today: a Claude Code session started with `/tdd-analyst`
-     (`.claude/skills/tdd-analyst/`). It reuses earlier engineer decisions
-     for the same problem and asks only about what they do not settle.
-   - Clarifies the customer's goal, scope, terminology, and unanswered
-     questions before implementation.
-   - Produces observable, independently verifiable acceptance criteria.
-   - Defines expected execution context, scale, workload, and measurable
-     performance requirements when relevant.
-   - Separates confirmed requirements from assumptions and open decisions.
-   - Does not prescribe implementation details unless the customer explicitly
-     requires them.
+- Today: a Claude Code session started with `/tdd-controller`
+  (`.claude/skills/tdd-controller/`). It runs one criterion at a time
+  through the coding agents, verifies each commit, and stops for engineer
+  approval. It never writes production or test code itself.
+- Later automation:
+  - Coordinates work and routes artifacts between roles.
+  - Tracks status, deadlines, retries, and blockers.
+  - Reports progress and pipeline issues.
+  - Uses deterministic automation for timers and state transitions where
+    possible; escalates stalled or unrecoverable work to an engineer.
 
-3. Architect
-   - Today: a Claude Code session started with `/tdd-architect`
-     (`.claude/skills/tdd-architect/`).
-   - Turns approved acceptance criteria into a design document and an
-     engineering decision log, one decision at a time with the engineer,
-     reusing earlier engineer decisions for the same problem.
-   - Proposes options with tradeoffs and a recommendation; does not claim
-     performance benefits without measurements.
-   - After design approval, scaffolds the empty solution and projects. Writes
-     no production behavior or tests.
+### 2. Task analyst
 
-4. Coding agents
-   Three Claude Code subagents (`.claude/agents/`), each with its own
-   context, sharing the rules in `.claude/skills/tdd-common-rules/`:
-   - Test writer (RED): writes the failing test for one criterion, with
-     signature-only stubs so it compiles, and commits [RED].
-   - Implementer (GREEN): makes the smallest production change that passes
-     it, without touching tests, and commits [GREEN].
-   - Refactorer (REFACTOR, optional): makes behavior-preserving cleanups of
-     source and tests when a concrete benefit exists, and commits
-     [REFACTOR]; otherwise it reports a skip.
-   - All three explain decisions, tradeoffs, and remaining limitations, and
-     propose guidance updates; the controller applies approved changes in a
-     separate commit.
+- Today: a Claude Code session started with `/tdd-analyst`
+  (`.claude/skills/tdd-analyst/`). It reuses earlier engineer decisions
+  for the same problem and asks only about what they do not settle.
+- Clarifies the customer's goal, scope, terminology, and unanswered
+  questions before implementation.
+- Produces observable, independently verifiable acceptance criteria.
+- Defines expected execution context, scale, workload, and measurable
+  performance requirements when relevant.
+- Separates confirmed requirements from assumptions and open decisions.
+- Does not prescribe implementation details unless the customer explicitly
+  requires them.
 
-5. Quality reviewer (no agent yet)
-   - Independently checks the implementation and tests against the approved
-     acceptance criteria.
-   - Verifies that tests assert required behavior, including relevant edge
-     cases, concurrency, and failure behavior.
-   - Reviews readability, unnecessary complexity, duplication, design
-     boundaries, and applicable SOLID principles.
-   - Checks test, build, formatting, static-analysis, and coverage results
-     required by the repository.
-   - Gives specific, actionable feedback tied to a criterion or quality gate.
-     Unresolved ambiguity or disagreement is escalated to an engineer.
-   - Proposes quality-guidance updates for engineer review; it does not
-     silently change its own rules.
+### 3. Architect
 
-Delivery process
-----------------
+- Today: a Claude Code session started with `/tdd-architect`
+  (`.claude/skills/tdd-architect/`).
+- Turns approved acceptance criteria into a design document and an
+  engineering decision log, one decision at a time with the engineer,
+  reusing earlier engineer decisions for the same problem.
+- Proposes options with tradeoffs and a recommendation; does not claim
+  performance benefits without measurements.
+- After design approval, scaffolds the empty solution and projects. Writes
+  no production behavior or tests.
+
+### 4. Coding agents
+
+Three Claude Code subagents (`.claude/agents/`), each with its own
+context, sharing the rules in `.claude/skills/tdd-common-rules/`:
+
+- Test writer (RED): writes the failing test for one criterion, with
+  signature-only stubs so it compiles, and commits [RED].
+- Implementer (GREEN): makes the smallest production change that passes
+  it, without touching tests, and commits [GREEN].
+- Refactorer (REFACTOR, optional): makes behavior-preserving cleanups of
+  source and tests when a concrete benefit exists, and commits
+  [REFACTOR]; otherwise it reports a skip.
+- All three explain decisions, tradeoffs, and remaining limitations, and
+  propose guidance updates; the controller applies approved changes in a
+  separate commit.
+
+### 5. Quality reviewer (no agent yet)
+
+- Independently checks the implementation and tests against the approved
+  acceptance criteria.
+- Verifies that tests assert required behavior, including relevant edge
+  cases, concurrency, and failure behavior.
+- Reviews readability, unnecessary complexity, duplication, design
+  boundaries, and applicable SOLID principles.
+- Checks test, build, formatting, static-analysis, and coverage results
+  required by the repository.
+- Gives specific, actionable feedback tied to a criterion or quality gate.
+  Unresolved ambiguity or disagreement is escalated to an engineer.
+- Proposes quality-guidance updates for engineer review; it does not
+  silently change its own rules.
+
+## Delivery process
 
 1. Intake: The analyst asks questions, records scope and assumptions, and
    drafts acceptance criteria. The engineer resolves open decisions and
@@ -131,8 +131,7 @@ Commit at useful, reviewable checkpoints, with passing tests for shared
 changes. Commit messages and the final handoff should explain the behavior
 delivered and important decisions.
 
-Requirements and work tracking
-------------------------------
+## Requirements and work tracking
 
 - Keep each acceptance criterion small enough to verify independently.
 - Track status and link every criterion to its tests, implementation change,
@@ -144,8 +143,7 @@ Requirements and work tracking
 - Keep CI as the reproducible source of truth for builds, tests, formatting,
   and static analysis.
 
-Quality principles
-------------------
+## Quality principles
 
 - Optimize for tests that verify behavior, not for a line-coverage number
   alone. Set meaningful coverage expectations for important behavior and
@@ -158,8 +156,7 @@ Quality principles
 - Record engineer decisions as project guidance. Changes to agent instructions
   or skills are proposals until reviewed and approved.
 
-Models
-------
+## Models
 
 Choose models by capability and evaluate them on representative tasks from the
 target repository. Favor strong reasoning and careful instruction-following
@@ -170,8 +167,7 @@ the `model` field; when it is not set, the agent uses the session's model.
 Model availability changes by Claude plan and organization; validate the
 options currently available rather than relying on fixed model names.
 
-Pilot and success measures
---------------------------
+## Pilot and success measures
 
 1. Use one small, low-risk feature with explicit engineer approval between
    analysis, design, implementation, and final review.
@@ -185,8 +181,7 @@ Pilot and success measures
    reliable. Keep human approval for ambiguous requirements and significant
    design decisions.
 
-Open questions
---------------
+## Open questions
 
 - Next step: pilot 2 reruns the TransactionDeduplicator task from analysis
   onward in `pilot/TransactionDeduplicator/pilot2/`, with the analyst,
@@ -206,8 +201,7 @@ Open questions
   out-of-scope writes are an option if agents stray.
 - Quality reviewer: no agent yet.
 
-Scope boundaries
-----------------
+## Scope boundaries
 
 This project develops and evaluates an agent-assisted software delivery
 workflow. An agent's implementation must not claim guarantees that the
