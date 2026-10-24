@@ -43,9 +43,8 @@ flowchart LR
     linkStyle 8 stroke:#777,stroke-width:1px
     style WF fill:none,stroke:#666,stroke-dasharray:4 4
     style H fill:none,stroke:#666,stroke-dasharray:4 4
-    style D fill:#2a2a2a,stroke:#999,color:#ddd
-    style S fill:#2a2a2a,stroke:#999,color:#ddd
-    style T fill:#2a2a2a,stroke:#aaa,stroke-dasharray:5 3,color:#ddd
+    style C fill:#80808014,stroke:#888
+    style T stroke-dasharray:5 3
 ```
 
 ✓ marks the engineer's approval: every step ends with it. The analyst and
