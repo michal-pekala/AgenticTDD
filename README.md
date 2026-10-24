@@ -10,7 +10,7 @@ every decision and every commit.
 ## How it works
 
 ```mermaid
-%%{init: {"flowchart": {"subGraphTitleMargin": {"top": 8, "bottom": 18}}}}%%
+%%{init: {"flowchart": {"rankSpacing": 70, "subGraphTitleMargin": {"top": 8, "bottom": 18}}}}%%
 flowchart LR
     subgraph WF ["Workflow"]
         direction TB
