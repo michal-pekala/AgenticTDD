@@ -133,3 +133,23 @@ $RECYCLE.BIN/
 _NCrunch*
 
 .vs/
+# =========================
+# Secrets and local settings
+# =========================
+
+# Environment files (commit a .env.example with placeholders instead)
+.env
+.env.*
+!.env.example
+
+# Keys and certificates
+*.pem
+*.key
+*.pfx
+*.p12
+
+# .NET user secrets exported by mistake
+secrets.json
+
+# Claude Code personal settings (permissions, local paths)
+.claude/settings.local.json
