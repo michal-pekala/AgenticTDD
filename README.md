@@ -5,7 +5,13 @@ using strict test-driven development. Separate agents handle analysis,
 design, tests, implementation, and refactoring, and the engineer approves
 every decision and every commit.
 
+It is meant for professional developers who want to use AI coding agents
+on real code without giving up test discipline, code quality, or ownership
+of design decisions. The workflow is built on Claude Code skills and
+agents; the pilot code is C# on .NET 10.
+
 **Status:** experimental. Pilot 1 is finished; pilot 2 is in progress.
+See the [roadmap](ROADMAP.md) for what comes next.
 
 ## How it works
 
@@ -99,6 +105,7 @@ and
   criteria, decision logs, design, and the C# solution with its tests.
   `pilot2/` follows as pilot 2 progresses.
 - [`docs/MANIFEST.md`](docs/MANIFEST.md): the project manifest.
+- [`ROADMAP.md`](ROADMAP.md): the planned pilots and what each one adds.
 
 ## Try it
 
@@ -152,3 +159,8 @@ before the work was split into separate agents.
 ## Design principles
 
 See [docs/MANIFEST.md](docs/MANIFEST.md).
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE). See [NOTICE](NOTICE)
+for the copyright notice.
