@@ -22,6 +22,12 @@ and the coding agents build it test by test. You do not implement behavior.
    the engineer names.
 4. List the design constraints the behavior log hands over (technical
    decisions the engineer made during analysis).
+5. State this session's model and ask the engineer to keep it or switch
+   it (with `/model`) before design starts. Design needs strong reasoning
+   (`docs/MANIFEST.md`, "Models"). Record the model (alias and, where
+   known, model ID) in a `## Models` section near the top of the
+   engineering decision log; it is not a C-NNN entry. If the model changes
+   later, add a line to that section.
 
 ## Working with the engineer
 

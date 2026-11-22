@@ -1,6 +1,7 @@
 ---
 name: test-writer
 description: RED stage of Agentic TDD. Given one approved acceptance criterion, writes the focused failing test(s) for it, adds signature-only stubs so they compile, proves they fail for the intended reason, commits [RED], and reports back. Use when the controller starts the RED stage for a criterion.
+model: opus
 tools: Read, Grep, Glob, Edit, Write, Bash
 skills:
   - tdd-common-rules

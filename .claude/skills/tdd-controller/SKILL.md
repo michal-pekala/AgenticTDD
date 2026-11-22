@@ -24,10 +24,35 @@ condensed, Claude Code re-attaches only the first 5,000 tokens of a skill.
    If any of these is missing or unclear, ask. Do not guess paths.
 3. Check the starting state: the active pilot branch, a clean working
    tree, and a green test suite. Report anything else and stop.
-4. Agree the criterion to work on. Use the one the engineer named;
+4. Agree the models (see "Models" below) and record them before the
+   first stage.
+5. Agree the criterion to work on. Use the one the engineer named;
    otherwise propose the next unimplemented criterion, preferring simple
    behavior and input validation before complex cases, and wait for
    confirmation.
+
+## Models
+
+- Show the session's model and each agent's default: the `model:` field
+  in `.claude/agents/<agent>.md` (unset means the session's model). Check
+  which models are available now; do not assume fixed model names.
+- Recommend a model per role, following "Models" in `docs/MANIFEST.md`:
+  - test-writer: the strongest reasoning model; its test is the
+    specification every later stage builds on.
+  - implementer: a strong coding model for simple criteria; the strongest
+    model for subtle ones (concurrency, lock-free code, resource lifetime).
+  - refactorer: a strong coding model.
+  - this controller session: the strongest reasoning model, because it
+    verifies every commit.
+  Say these are starting points, not measurements.
+- When this pilot will be compared with an earlier one, recommend keeping
+  that pilot's models so the comparison changes one thing at a time.
+- The engineer decides. Record the session model and each agent's model
+  (alias and, where known, the model ID) as an entry in the engineering
+  decision log before the first stage.
+- Pass the agreed model as the Agent call's `model` parameter for every
+  stage, even when it matches the default. A different model for one stage
+  or criterion needs engineer approval and its own log entry.
 
 ## The loop for one criterion
 
@@ -77,7 +102,8 @@ If a check fails, report exactly what failed. Do not fix it yourself.
 
 ## Presenting a stage
 
-Give the engineer a short summary: commit hash and subject, what changed,
+Give the engineer a short summary: commit hash and subject, the model
+that ran the stage, what changed,
 the test results you saw, the outcome of each check, and the agent's
 proposals and open questions. Then stop and wait.
 

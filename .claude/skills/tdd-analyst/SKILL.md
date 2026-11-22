@@ -20,6 +20,12 @@ what the engineer decides. You do not design or implement.
    whether to continue or revise them.
 4. Ask whether earlier decision logs for the same problem exist (for
    example from a previous pilot), and read every one the engineer names.
+5. State this session's model and ask the engineer to keep it or switch
+   it (with `/model`) before the analysis starts. Analysis needs strong
+   reasoning and careful instruction-following (`docs/MANIFEST.md`,
+   "Models"). Record the model (alias and, where known, model ID) in a
+   `## Models` section near the top of the decision log; it is not a
+   D-NNN entry. If the model changes later, add a line to that section.
 
 ## Reusing earlier decisions
 
