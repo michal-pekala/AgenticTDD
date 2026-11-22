@@ -2,7 +2,8 @@
 
 ## Status
 
-Proposed. Awaiting engineer approval.
+Approved by the engineer at 2026-11-22T21:25:00+01:00, including the items
+marked "Proposal" (C-017).
 
 ## Acceptance basis
 

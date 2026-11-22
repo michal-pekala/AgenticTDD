@@ -244,3 +244,32 @@ document is not reused (C-010).
   risks and does not change any criterion.
 
 No unresolved conflict.
+
+### C-017 - Design approved, including its proposals
+
+- Recorded at: 2026-11-22T21:25:00+01:00
+- Decision time: 2026-11-22T21:25:00+01:00
+- Context/question: Approve `TransactionDeduplicator-Design.md`, including
+  the four items it marks "Proposal" and its namespaces.
+- Engineer decision: Approved as written:
+  - a `null` options argument throws `ArgumentNullException` from the
+    constructor (not configuration validation, so D-013 is unaffected);
+  - `IsUniqueAndProcess` checks in order: disposed, configuration (C-012),
+    then the ID (D-004, D-008), all before any state is touched;
+  - calls after `Dispose` throw `ObjectDisposedException`; `Dispose` is
+    idempotent;
+  - an exception in the cleaner timer callback is caught, stored, and
+    rethrown by the next `IsUniqueAndProcess` call;
+  - namespaces `TransactionDeduplication` and
+    `TransactionDeduplication.Tests`.
+- Affected work: Public API, failure handling, scaffold, controller handoff.
+- Status: Active
+
+## Consistency review after C-017
+
+C-017 adds API behavior outside the acceptance criteria (null options,
+disposal, cleaner failure). None of it changes an AC-1 to AC-12 outcome: the
+null-options check is an argument check, not configuration validation
+(D-013), and disposal and cleaner failure are outside the criteria's
+outcomes. The validation order keeps every rejection before any state change
+(AC-4, AC-6, AC-12). No conflict.
