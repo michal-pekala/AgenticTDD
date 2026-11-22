@@ -18,7 +18,7 @@ document is not reused (C-010).
   (`claude-opus-5-5`). Recorded retrospectively on 2026-11-22; the model was
   not confirmed with the engineer at the start, because that step did not
   exist yet.
-- Controller session and coding agents: see C-018.
+- Controller session and coding agents: see C-018, superseded by C-019.
 
 ## Decisions
 
@@ -301,3 +301,27 @@ outcomes. The validation order keeps every rejection before any state change
 - Affected work: Every RED, GREEN and REFACTOR stage of pilot 2; the pilot 1
   versus pilot 2 comparison.
 - Status: Active
+
+### C-019 - Best suggested model per role
+
+- Recorded at: 2026-11-22T21:47:35+01:00
+- Decision time: 2026-11-22T21:47:35+01:00
+- Context/question: C-018 kept every role on Opus so pilot 2 could be
+  compared with pilot 1 on one variable. The engineer does not need that:
+  models need not match pilot 1.
+- Engineer decision: Use the per-role models suggested by the controller
+  skill ("Models"):
+  - controller session: Opus 5.5 (`claude-opus-5-5`);
+  - test-writer: `opus` (Opus 5.5, `claude-opus-5-5`) for every
+    criterion;
+  - implementer: `sonnet` (Sonnet 5.5, `claude-sonnet-5-5`) for simple
+    criteria; `opus` for AC-5, AC-6 and AC-7, which carry the lock-free
+    compare-and-swap, slot counting and concurrent sweeping (C-015);
+  - refactorer: `sonnet` (Sonnet 5.5, `claude-sonnet-5-5`).
+  The controller passes the model explicitly on every agent call; the
+  agent files' `model: opus` defaults are not relied on. Any other
+  per-stage change needs engineer approval and a new entry.
+- Affected work: Every RED, GREEN and REFACTOR stage of pilot 2; the pilot 1
+  versus pilot 2 comparison now differs in models as well as in agent
+  split.
+- Status: Active; supersedes C-018.
