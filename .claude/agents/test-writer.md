@@ -68,8 +68,15 @@ otherwise.
 - Hold configuration in a get-only `Options` property whose object is
   mutable (`Options { get; } = new();`). Make it `private` in a single test
   class, or `protected` on a shared test base class so the derived tests
-  can reach it. Each test sets the values it needs as its first
-  statements.
+  can reach it.
+- Arrange in a test only the dimensions its behavior depends on. Values
+  that merely need to be valid (happy-path, any value works) go in common
+  setup instead: the `Options` initializer or the test class constructor,
+  a shared base class, or the fake or fixture object. A test that uses
+  such a value reads it from there (`var expiration =
+  Options.UniqnessCheckExpiration;`) rather than setting it. Set a value
+  in the test, as its first statements, only when the test needs that
+  specific value or category (for example an invalid setting).
 - Expose the system under test as a `Sut` property that is created lazily
   on first access (`_sut ??= new ...`), so a test can set options and the
   clock before the object exists.
@@ -104,8 +111,8 @@ otherwise.
   value built as `$"not-valid-{Guid.NewGuid()}"`). Use a constant only when
   the test needs that specific value, or when `InlineData` requires a
   literal.
-- Randomize configured durations with `Random.Shared` unless a specific
-  value is under test. Choose the range so the test's boundary arithmetic
+- Randomize configured durations with `Random.Shared` in the common setup
+  unless a specific value is under test. Choose the range so the test's boundary arithmetic
   stays valid (for example a minimum of 2 seconds when the test uses
   `expiration / 2` and `expiration - 1.Milliseconds()`).
 
