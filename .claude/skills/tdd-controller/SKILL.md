@@ -137,9 +137,11 @@ proposals and open questions. Then stop and wait.
 When the host can show a diff beside the conversation (for example the
 Claude desktop app's diff pane), open the diff of the stage's commit,
 scrolled to its main changed file, before presenting. Open it again after
-every stage: a diff of one commit does not follow later commits. Scope it
-to that commit alone by its full hash (not a short hash, not the branch),
-so it shows only the current stage's files. Open it in the same message
+every stage: a diff of one commit does not follow later commits. Pass the
+commit's full hash as the scope; the Claude desktop app's pane may still
+open on "All changes", so also tell the engineer which row to click in
+the pane's Commits list (the stage's subject and short hash) to see only
+that commit. Open it in the same message
 as the verification commands, not as a step of its own. The pane is
 drawn by the host and costs almost no tokens.
 
