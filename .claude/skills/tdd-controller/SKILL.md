@@ -85,6 +85,11 @@ proposals) and ask before starting the next one.
 
 Check these yourself; do not rely on the agent's report alone.
 
+Keep the number of steps low: every step re-reads the whole conversation,
+so it costs about the same however small it is. Run the git checks and
+the test suite in one command, and send independent calls (verification,
+the diff pane, the task list) together in one message.
+
 - **One commit**: exactly one new commit since the last approved state
   (none for a skipped refactor), and a clean working tree.
 - **Subject**: `<short behavior name> [RED|GREEN|REFACTOR]`, with the same
@@ -121,7 +126,9 @@ proposals and open questions. Then stop and wait.
 When the host can show a diff beside the conversation (for example the
 Claude desktop app's diff pane), open the diff of the stage's commit,
 scrolled to its main changed file, before presenting. Open it again after
-every stage: a diff of one commit does not follow later commits.
+every stage: a diff of one commit does not follow later commits. Open it
+in the same message as the verification commands, not as a step of its
+own.
 
 ## On rejection
 
