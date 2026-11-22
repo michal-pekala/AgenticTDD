@@ -146,6 +146,29 @@ own.
 - Apply only the changes the engineer approves, in a commit of their own,
   never in a stage commit. Subject: `Guidance: <what changed>`.
 
+## Usage
+
+You cannot see the engineer's usage limit, but you can see what drives
+it: every step re-reads the whole conversation, so cost per step grows
+with its length. Watch for signs that usage is climbing fast: a long
+conversation (several criteria done, earlier stages such as analysis or
+design in the same session), repeated rejected attempts at one stage,
+many agent runs, or the engineer mentioning the limit. Then, at the next
+stage boundary, suggest concrete ways to cut it, with a short reason
+for each:
+
+- continue in a new session: all state is in the repository (criteria,
+  logs, design, commits), so a fresh `/tdd-controller` can resume;
+  offer to start it with a hand-over brief (branch, HEAD, the stage
+  awaiting approval, agreed models);
+- turn off connectors the pilot does not use (in the composer's
+  + > Connectors);
+- fewer, batched steps per stage;
+- a lighter model for a role, only with engineer approval and a log
+  entry.
+
+Suggest; do not act on these without the engineer's approval.
+
 ## Never
 
 - Write to `src/` or `tests/`, or edit an agent's commit.
