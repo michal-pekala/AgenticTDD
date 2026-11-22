@@ -10,21 +10,13 @@ namespace TransactionDeduplication.Tests;
 public sealed class InvalidTransactionIdTests : ExpirationTestsBase
 {
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData("\t\r\n")]
-    [InlineData("not-a-guid")]
+    [MemberData(nameof(InvalidTransactionIds.All), MemberType = typeof(InvalidTransactionIds))]
     public void Invalid_transaction_id_is_rejected(string? invalidId)
         => Sut
             .AssertRejected(invalidId);
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData("\t\r\n")]
-    [InlineData("not-a-guid")]
+    [MemberData(nameof(InvalidTransactionIds.All), MemberType = typeof(InvalidTransactionIds))]
     public void Invalid_transaction_id_throws_ArgumentException(string? invalidId)
         => FluentActions
             .Invoking(() => Sut.IsUniqueAndProcess(invalidId!))
@@ -39,11 +31,7 @@ public sealed class InvalidTransactionIdTests : ExpirationTestsBase
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData("\t\r\n")]
-    [InlineData("not-a-guid")]
+    [MemberData(nameof(InvalidTransactionIds.All), MemberType = typeof(InvalidTransactionIds))]
     public void Active_id_is_still_a_duplicate_after_invalid_id_is_rejected(string? invalidId)
     {
         var transactionId = Guid.NewGuid().ToString();
@@ -56,11 +44,7 @@ public sealed class InvalidTransactionIdTests : ExpirationTestsBase
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData("\t\r\n")]
-    [InlineData("not-a-guid")]
+    [MemberData(nameof(InvalidTransactionIds.All), MemberType = typeof(InvalidTransactionIds))]
     public void Rejected_invalid_id_does_not_restart_expiration_of_active_id(string? invalidId)
     {
         var transactionId = Guid.NewGuid().ToString();
@@ -78,11 +62,7 @@ public sealed class InvalidTransactionIdTests : ExpirationTestsBase
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData("\t\r\n")]
-    [InlineData("not-a-guid")]
+    [MemberData(nameof(InvalidTransactionIds.All), MemberType = typeof(InvalidTransactionIds))]
     public void Empty_guid_is_still_unseen_after_invalid_id_is_rejected(string? invalidId)
     {
         Sut.AssertRejected(invalidId);

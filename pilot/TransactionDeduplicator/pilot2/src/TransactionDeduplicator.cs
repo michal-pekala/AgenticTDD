@@ -37,7 +37,7 @@ public sealed class TransactionDeduplicator
         return !isActive;
     }
 
-    private static Guid ParseTransactionId(string transactionId)
+    private Guid ParseTransactionId(string transactionId)
     {
         ArgumentNullException.ThrowIfNull(transactionId);
 
