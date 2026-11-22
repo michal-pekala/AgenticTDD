@@ -90,6 +90,17 @@ so it costs about the same however small it is. Run the git checks and
 the test suite in one command, and send independent calls (verification,
 the diff pane, the task list) together in one message.
 
+Read only what a check needs: everything you read stays in the
+conversation and is re-read on every later step.
+
+- Tests: print only the summary line; on failure, group failures by
+  reason (count and one message), never one line per test case.
+- Commit body: print the subject; search the body for what a check needs
+  (grouped criteria, mutation proof) instead of printing it.
+- Diffs: read the `src/` diff for RED stubs and the `tests/` diff when a
+  GREEN or REFACTOR touches tests. Otherwise `--stat` or `--name-only` is
+  enough; the engineer reads the code in the diff pane.
+
 - **One commit**: exactly one new commit since the last approved state
   (none for a skipped refactor), and a clean working tree.
 - **Subject**: `<short behavior name> [RED|GREEN|REFACTOR]`, with the same
@@ -126,9 +137,11 @@ proposals and open questions. Then stop and wait.
 When the host can show a diff beside the conversation (for example the
 Claude desktop app's diff pane), open the diff of the stage's commit,
 scrolled to its main changed file, before presenting. Open it again after
-every stage: a diff of one commit does not follow later commits. Open it
-in the same message as the verification commands, not as a step of its
-own.
+every stage: a diff of one commit does not follow later commits. Scope it
+to that commit alone by its full hash (not a short hash, not the branch),
+so it shows only the current stage's files. Open it in the same message
+as the verification commands, not as a step of its own. The pane is
+drawn by the host and costs almost no tokens.
 
 ## On rejection
 
@@ -166,6 +179,10 @@ for each:
 - fewer, batched steps per stage;
 - a lighter model for a role, only with engineer approval and a log
   entry.
+
+When a criterion is done, offer a fresh session for the next one even
+without these signs: about half of each step's cost is fixed overhead
+(tools, system prompt), and a short conversation keeps the rest small.
 
 Suggest; do not act on these without the engineer's approval.
 
