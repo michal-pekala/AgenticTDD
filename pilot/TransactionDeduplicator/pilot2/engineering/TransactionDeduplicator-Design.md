@@ -50,10 +50,10 @@ pilot/TransactionDeduplicator/pilot2/
 ## Public API
 
 ```csharp
-public sealed class TransactionDeduplicatorOptions                  // C-008, D-009
+public sealed class TransactionDeduplicatorOptions                  // C-008, C-020, D-009
 {
-    public TimeSpan UniqnessCheckExpiration { get; init; } = TimeSpan.FromSeconds(10);
-    public int UniqnessBufferCapacity { get; init; } = 1_000_000;
+    public TimeSpan UniqnessCheckExpiration { get; set; } = TimeSpan.FromSeconds(10);
+    public int UniqnessBufferCapacity { get; set; } = 1_000_000;
 }
 
 public sealed class TransactionDeduplicator : IDisposable             // C-014
@@ -92,7 +92,8 @@ public sealed class CapacityExceededException : Exception            // D-002, C
   casing. `Guid.Empty` is a valid ID. Parsing and validation live in
   separate helpers (C-002); error templates live in `ValidationError` and are
   formatted with `StringExtensions.Format` (C-006).
-- Options are read once, at construction. Changing the options object later
+- Options are settable (C-020) and read once, at construction. Changing the
+  options object later
   has no effect.
 
 ## Internal design

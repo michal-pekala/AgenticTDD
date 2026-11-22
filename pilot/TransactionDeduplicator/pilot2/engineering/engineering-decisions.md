@@ -325,3 +325,21 @@ outcomes. The validation order keeps every rejection before any state change
   versus pilot 2 comparison now differs in models as well as in agent
   split.
 - Status: Active; supersedes C-018.
+
+### C-020 - Option properties are settable
+
+- Recorded at: 2026-11-22T22:19:17+01:00
+- Decision time: 2026-11-22T22:19:17+01:00
+- Context/question: The AC-2 RED (d3c880b) showed a conflict: the
+  test-writer guidance holds configuration in a get-only `Options` property
+  whose object is mutable, with each test setting the values it needs as its
+  first statements; the approved design made the option properties
+  `init`-only, so tests could only set values in an object initializer.
+- Engineer decision: Make `UniqnessCheckExpiration` and
+  `UniqnessBufferCapacity` `{ get; set; }`. The deduplicator still reads
+  them once, at construction, so later changes have no effect. The AC-2 RED
+  commit d3c880b was rejected and discarded, to be redone with each test
+  setting its options as its first statements.
+- Affected work: `TransactionDeduplicatorOptions` (refines C-008); design
+  "Public API"; AC-2 RED and later tests.
+- Status: Active
