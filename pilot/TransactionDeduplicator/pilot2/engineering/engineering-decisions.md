@@ -12,6 +12,14 @@ test-style entries (commit gates, stage rules, test formatting) are skipped,
 because the pilot 2 agents' instructions cover them. Pilot 1's design
 document is not reused (C-010).
 
+## Models
+
+- Architect session (2026-10-19 to 2026-11-22): Opus 5.5
+  (`claude-opus-5-5`). Recorded retrospectively on 2026-11-22; the model was
+  not confirmed with the engineer at the start, because that step did not
+  exist yet.
+- Controller session and coding agents: see C-018.
+
 ## Decisions
 
 ### C-001 - Class library with a solution and separate source and test folders
@@ -273,3 +281,23 @@ null-options check is an argument check, not configuration validation
 (D-013), and disposal and cleaner failure are outside the criteria's
 outcomes. The validation order keeps every rejection before any state change
 (AC-4, AC-6, AC-12). No conflict.
+
+### C-018 - Models for the controller and coding agents
+
+- Recorded at: 2026-11-22T21:45:44+01:00
+- Decision time: 2026-11-22T21:45:44+01:00
+- Context/question: Which models run the pilot 2 controller session and the
+  coding agents. The roadmap compares pilot 1 (one coding agent) with pilot
+  2 (three agents); changing models as well would mix two variables.
+- Engineer decision: Keep every role on Opus for pilot 2:
+  - controller session: Opus 5.5 (`claude-opus-5-5`);
+  - test-writer, implementer, refactorer: `model: opus` in their agent
+    files, currently resolving to Opus 5.5 (`claude-opus-5-5`), passed
+    explicitly on every agent call.
+  Per-role recommendations (for example a lighter coding model for simple
+  implementer and refactorer stages) are left for a later pilot that
+  measures them. Any per-stage change needs engineer approval and a new
+  entry.
+- Affected work: Every RED, GREEN and REFACTOR stage of pilot 2; the pilot 1
+  versus pilot 2 comparison.
+- Status: Active

@@ -15,6 +15,12 @@ Sources of reused entries:
 Reused entries carry the original decision time only where the source
 captured it. "Recorded at" is when the entry was written into this log.
 
+## Models
+
+- Analyst session (2026-10-19): Opus 5.5 (`claude-opus-5-5`). Recorded
+  retrospectively on 2026-11-22; the model was not confirmed with the
+  engineer at the start, because that step did not exist yet.
+
 ## Decisions
 
 ### D-001 - Duplicate attempts refresh expiration
