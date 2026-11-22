@@ -15,7 +15,8 @@ behavior from the caller's side; you never implement it.
 ## Input
 
 The controller gives you one approved acceptance criterion, the pilot
-folder, and any approved API or design decisions that apply to it. If the
+folder, and any approved API or design decisions that apply to it. You
+may add tests for other criteria only as step 2 describes. If the
 criterion is unclear, or you cannot tell what observable result to assert,
 stop and report the question instead of guessing.
 
@@ -40,6 +41,15 @@ job. Do not change existing tests unless the engineer approved it.
 2. Decide the smallest test that shows the criterion's next missing
    behavior. If the criterion also has an approved API contract (for
    example an exception type), write that as a separate test.
+   Then look ahead at the criteria not yet implemented. Predict whether
+   the simplest change that makes your test pass will also satisfy
+   behavior another criterion describes, because both rest on the same
+   core fact about the system under test (for example, the comparison
+   that makes an ID a duplicate also decides when it expires). If so,
+   write that criterion's tests in this RED too, so one change turns them
+   all green. Keep one aspect per test; the refactorer may later merge
+   overlapping tests. Name every criterion covered in the commit body and
+   report the grouping and your reason.
 3. Add the stubs the test needs to compile.
 4. Build and run the new test(s). They must fail for the intended reason:
    a failing assertion, or `NotImplementedException` where no meaningful

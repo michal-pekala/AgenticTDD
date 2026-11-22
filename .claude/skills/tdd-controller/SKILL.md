@@ -74,6 +74,10 @@ Each agent starts with a fresh context, so its prompt must contain
 everything it needs. Never pass on your own guesses about the
 implementation.
 
+A RED may also cover other criteria that the test-writer grouped with
+this one because one change satisfies them all. Check that the commit
+body names them; they are then done together with this criterion.
+
 When the criterion is done, summarize it (commits, tests added, open
 proposals) and ask before starting the next one.
 
