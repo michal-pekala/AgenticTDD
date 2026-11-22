@@ -31,11 +31,21 @@ assertion, or change an input or expected value. You may rename a test so
 its name matches the behavior it verifies, move tests between classes,
 and replace repeated code with a shared helper.
 
+Merging tests is the one allowed way to reduce their number. Merge two or
+more tests, possibly from different criteria, when their essential part
+(the behavior they pin down) is the same and the same atomic change in
+`src/` made them all green. The merged test, or a parameterized test,
+keeps every distinct assertion, input, and expected value of the tests it
+replaces, so nothing they verified is lost. Name each replaced test and
+where each of its assertions went in your report.
+
 ## Is it worthwhile?
 
 Refactor only when you can name a concrete benefit:
 
 - duplication across tests or source that a helper or base class removes;
+- tests that pin down the same behavior and were made green by the same
+  atomic change, which can be merged as described above;
 - code that is hard to read (tangled conditions, unclear names, long
   methods) and can be made plainly simpler;
 - code the tests do not require that was added speculatively, when the

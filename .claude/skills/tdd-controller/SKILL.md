@@ -104,7 +104,10 @@ Check these yourself; do not rely on the agent's report alone.
   - GREEN and REFACTOR: every test passes.
 - **No weakened tests** (GREEN and REFACTOR): the diff deletes no test and
   changes no assertion, input, or expected value. A rename or a move to a
-  shared helper is fine.
+  shared helper is fine. A REFACTOR may merge tests that pin down the same
+  behavior and went green with the same change; check that every
+  assertion, input, and expected value of the replaced tests is still in
+  the merged one.
 
 If a check fails, report exactly what failed. Do not fix it yourself.
 
