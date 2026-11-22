@@ -343,3 +343,20 @@ outcomes. The validation order keeps every rejection before any state change
 - Affected work: `TransactionDeduplicatorOptions` (refines C-008); design
   "Public API"; AC-2 RED and later tests.
 - Status: Active
+
+### C-021 - Criteria already satisfied: commit tests with a mutation proof
+
+- Recorded at: 2026-11-22T22:50:13+01:00
+- Decision time: 2026-11-22T22:50:13+01:00
+- Context/question: The AC-3 RED tests (exact expiration boundary, D-005)
+  all passed against the AC-2 GREEN code (56e93f3), whose `<` comparison
+  already expires an ID at exactly last attempt plus expiration. The
+  test-writer committed nothing. How should such a criterion be recorded?
+- Engineer decision: Commit the tests as `[RED]` with a body saying they
+  already pass. Prove each can fail by a temporary, uncommitted change to
+  `src/` (for AC-3, `<` changed to `<=` for the exact-boundary test), and
+  name that mutation in the commit body. GREEN is skipped; REFACTOR follows
+  as usual. Applies to AC-3 and to later criteria in the same situation;
+  the general rule is in the test-writer and controller guidance.
+- Affected work: AC-3 and any later already-satisfied criterion.
+- Status: Active
