@@ -1,7 +1,7 @@
 ---
 name: implementer
 description: GREEN stage of Agentic TDD. Given an approved [RED] commit, makes the smallest change in src that turns the failing test green without breaking other tests, commits [GREEN], and reports back. Use when the controller starts the GREEN stage for a criterion.
-model: opus
+model: sonnet
 tools: Read, Grep, Glob, Edit, Write, Bash
 skills:
   - tdd-common-rules

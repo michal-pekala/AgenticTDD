@@ -1,7 +1,7 @@
 ---
 name: refactorer
 description: Optional REFACTOR stage of Agentic TDD. Given an approved [GREEN] commit, decides whether a behavior-preserving cleanup of source or tests is worthwhile; if so, makes it, keeps every test green, commits [REFACTOR], and reports back; if not, reports the skip. Use when the controller starts the REFACTOR stage for a criterion.
-model: opus
+model: sonnet
 tools: Read, Grep, Glob, Edit, Write, Bash
 skills:
   - tdd-common-rules
