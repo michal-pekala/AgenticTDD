@@ -93,6 +93,10 @@ Check these yourself; do not rely on the agent's report alone.
   throw `NotImplementedException`; no logic.
 - **Tests**: run the whole suite yourself.
   - RED: only the new tests fail, with the failure the agent reported.
+    Exception: when the engineer decided the behavior already exists, the
+    new tests pass; check the commit body names the mutation that made
+    each fail. GREEN is then skipped with engineer approval, and REFACTOR
+    follows as usual.
   - GREEN and REFACTOR: every test passes.
 - **No weakened tests** (GREEN and REFACTOR): the diff deletes no test and
   changes no assertion, input, or expected value. A rename or a move to a

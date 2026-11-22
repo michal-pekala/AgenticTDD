@@ -46,7 +46,12 @@ job. Do not change existing tests unless the engineer approved it.
    default exists. A compile error is not RED.
 5. If a new test passes, stop and report it. Either the behavior already
    exists or a stub default satisfies the assertion by accident; do not
-   commit.
+   commit. Only when the engineer has decided that the behavior already
+   exists: prove each passing test can fail by a temporary, uncommitted
+   change to `src/` that breaks exactly that behavior, run it to see the
+   test fail, revert the change, and commit the tests with the `[RED]`
+   subject and a body that says they already pass and names the mutation
+   that made each one fail.
 6. Run the whole test suite. Every previously passing test must still pass.
 7. Commit with the subject `<short behavior name> [RED]`, then report and
    stop.
