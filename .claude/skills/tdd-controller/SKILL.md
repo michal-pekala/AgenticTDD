@@ -107,6 +107,11 @@ that ran the stage, what changed,
 the test results you saw, the outcome of each check, and the agent's
 proposals and open questions. Then stop and wait.
 
+When the host can show a diff beside the conversation (for example the
+Claude desktop app's diff pane), open the diff of the stage's commit,
+scrolled to its main changed file, before presenting. Open it again after
+every stage: a diff of one commit does not follow later commits.
+
 ## On rejection
 
 1. Record the engineer's feedback in their words.
