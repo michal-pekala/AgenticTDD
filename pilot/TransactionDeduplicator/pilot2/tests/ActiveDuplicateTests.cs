@@ -4,25 +4,8 @@ using TransactionDeduplication.Tests.Fixture;
 
 namespace TransactionDeduplication.Tests;
 
-public sealed class ActiveDuplicateTests
+public sealed class ActiveDuplicateTests : ExpirationTestsBase
 {
-    private readonly FakeDateTimeProvider _clock = new();
-    private TransactionDeduplicator? _sut;
-
-    private TransactionDeduplicatorOptions Options { get; } = new()
-    {
-        UniqnessCheckExpiration = Random.Shared.Next(2_000, 60_001).Milliseconds(),
-    };
-
-    private DateTimeOffset Now
-    {
-        get => _clock.CurrentTime;
-        set => _clock.CurrentTime = value;
-    }
-
-    private TransactionDeduplicator Sut
-        => _sut ??= new TransactionDeduplicator(Options, _clock, Timeout.InfiniteTimeSpan);
-
     [Fact]
     public void Duplicate_of_active_transaction_id_returns_false()
     {
