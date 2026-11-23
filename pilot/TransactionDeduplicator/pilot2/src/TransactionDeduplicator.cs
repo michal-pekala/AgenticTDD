@@ -37,6 +37,11 @@ public sealed class TransactionDeduplicator
         if (!isKnown && _lastAttempts.Count >= _uniquenessBufferCapacity)
         {
             SweepExpired(now);
+
+            if (_lastAttempts.Count >= _uniquenessBufferCapacity)
+            {
+                throw new CapacityExceededException(_uniquenessBufferCapacity);
+            }
         }
 
         _lastAttempts[id] = now;
