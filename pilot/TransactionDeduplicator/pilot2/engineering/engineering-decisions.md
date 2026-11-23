@@ -360,3 +360,39 @@ outcomes. The validation order keeps every rejection before any state change
   the general rule is in the test-writer and controller guidance.
 - Affected work: AC-3 and any later already-satisfied criterion.
 - Status: Active
+
+### C-022 - Messages and ParamName for invalid transaction IDs
+
+- Recorded at: 2026-11-23T01:05:16+01:00
+- Decision time: 2026-11-23T01:05:16+01:00
+- Context/question: AC-4 left open the messages for null, empty and
+  whitespace-only IDs (only the malformed message, C-006, was decided) and
+  whether invalid-ID exceptions carry a `ParamName`. Null threw the
+  framework's `ArgumentNullException` message; empty and whitespace already
+  produced the C-006 message; no exception set `ParamName`.
+- Engineer decision: Empty and whitespace-only IDs keep the C-006 message
+  (`TransactionId value '<invalidId>' is not a valid Guid.`). A null ID
+  throws `ArgumentNullException` (an `ArgumentException`, so D-004 holds)
+  with its own `ValidationError` template, e.g. `TransactionId must not be
+  null.` Every invalid-ID exception sets `ParamName` to `transactionId`.
+  Tests assert `ParamName` separately and the full `Message`, including the
+  framework suffix ` (Parameter 'transactionId')`, for null, empty,
+  whitespace and malformed IDs.
+- Affected work: `ValidationError`, ID validation, AC-4 tests. Done as its
+  own RED/GREEN/REFACTOR cycle ("Invalid ID messages") before AC-5.
+- Status: Active; refines C-006.
+
+### C-023 - Options are read once, at construction
+
+- Recorded at: 2026-11-23T01:05:16+01:00
+- Decision time: 2026-11-23T01:05:16+01:00
+- Context/question: Option properties are settable (C-020) and the design
+  says options are read once at construction, but the code held the options
+  object by reference and no test covered a change after construction.
+- Engineer decision: Follow the design: the constructor copies the option
+  values; changing the options object after construction has no effect on
+  the instance. A test pins this through observable behaviour.
+- Affected work: `TransactionDeduplicator` construction; design "Public API"
+  (unchanged). Done as its own RED/GREEN/REFACTOR cycle ("Options read once")
+  before AC-5.
+- Status: Active
