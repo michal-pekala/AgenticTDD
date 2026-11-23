@@ -1,5 +1,6 @@
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using TransactionDeduplication.Tests.Extensions;
 using TransactionDeduplication.Tests.Fixture;
 
 namespace TransactionDeduplication.Tests;
@@ -32,5 +33,22 @@ public sealed class OptionsReadOnceTests : ExpirationTestsBase
         Now += expiration;
 
         Sut.IsUniqueAndProcess(transactionId).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Capacity_raised_after_construction_does_not_apply()
+    {
+        Options.UniqnessBufferCapacity = Random.Shared.Next(2, 11);
+
+        var capacity = Options.UniqnessBufferCapacity;
+
+        for (var i = 0; i < capacity; i++)
+        {
+            Sut.IsUniqueAndProcess(Guid.NewGuid().ToString()).Should().BeTrue();
+        }
+
+        Options.UniqnessBufferCapacity = capacity * 2;
+
+        Sut.AssertRejected(Guid.NewGuid().ToString());
     }
 }
