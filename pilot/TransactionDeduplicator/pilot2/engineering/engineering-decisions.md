@@ -471,3 +471,11 @@ outcomes. The validation order keeps every rejection before any state change
   design document.
 - Status: Active; refines C-024 (the placeholder for the parameter name no
   longer applies; the rest of C-024 and C-025 hold).
+
+### Correction to C-026 timestamp
+
+- Recorded at: 2026-11-23T17:39:03+01:00
+- C-026 gives "Recorded at" and "Decision time" as 2026-11-23T02:00:00+01:00.
+  That time was not measured: the entry was written in REFACTOR commit
+  1b77740 at 2026-11-23T17:38:14+01:00, and the engineer decided C-026 shortly
+  before. Read C-026's times as 2026-11-23T17:38:14+01:00 (retrospective).
