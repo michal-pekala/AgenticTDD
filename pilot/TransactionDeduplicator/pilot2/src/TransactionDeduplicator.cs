@@ -23,6 +23,8 @@ public sealed class TransactionDeduplicator
         _dateTimeProvider = dateTimeProvider;
     }
 
+    internal int RetainedCount => 0;
+
     public bool IsUniqueAndProcess(string transactionId)
     {
         var id = ParseTransactionId(transactionId);
@@ -33,6 +35,10 @@ public sealed class TransactionDeduplicator
         _lastAttempts[id] = now;
 
         return !isActive;
+    }
+
+    internal void SweepExpired()
+    {
     }
 
     private Guid ParseTransactionId(string transactionId)
