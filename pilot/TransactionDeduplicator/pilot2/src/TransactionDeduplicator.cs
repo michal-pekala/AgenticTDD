@@ -1,5 +1,3 @@
-using TransactionDeduplication.Extensions;
-
 namespace TransactionDeduplication;
 
 public sealed class TransactionDeduplicator
@@ -39,12 +37,14 @@ public sealed class TransactionDeduplicator
 
     private Guid ParseTransactionId(string transactionId)
     {
-        ArgumentNullException.ThrowIfNull(transactionId);
+        if (transactionId is null)
+        {
+            throw new NullTransactionIdException();
+        }
 
         if (!Guid.TryParse(transactionId, out var id))
         {
-            throw new ArgumentException(
-                ValidationError.InvalidTransactionId.Format(transactionId));
+            throw new InvalidTransactionIdException(transactionId);
         }
 
         return id;

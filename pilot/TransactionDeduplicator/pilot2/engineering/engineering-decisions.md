@@ -424,3 +424,19 @@ outcomes. The validation order keeps every rejection before any state change
   exact type is left to GREEN within that constraint.
 - Affected work: `ValidationError`, ID validation, AC-4 tests.
 - Status: Active; refines C-022.
+
+### C-025 - Exception types for invalid transaction IDs
+
+- Recorded at: 2026-11-23T01:30:00+01:00
+- Decision time: 2026-11-23T01:30:00+01:00
+- Context/question: C-024 left the exact exception types to GREEN. The
+  templates already contain the ` (Parameter '...')` suffix, and .NET adds
+  its own when `ParamName` is set.
+- Decision (implementer proposal, pending engineer approval): two internal
+  sealed types in `src/`: `InvalidTransactionIdException` (derives from
+  `ArgumentException`; empty, whitespace and malformed IDs) and
+  `NullTransactionIdException` (derives from `ArgumentNullException`; null).
+  Both set `ParamName` to `ValidationError.TransactionIdParameter` and
+  override `Message` to return the formatted template unchanged.
+- Affected work: ID validation, AC-4 (D-004 still holds).
+- Status: Active; refines C-024.
