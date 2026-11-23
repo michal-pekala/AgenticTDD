@@ -440,3 +440,34 @@ outcomes. The validation order keeps every rejection before any state change
   override `Message` to return the formatted template unchanged.
 - Affected work: ID validation, AC-4 (D-004 still holds).
 - Status: Active; refines C-024.
+
+### C-026 - Parameter name written in the error templates
+
+- Recorded at: 2026-11-23T02:00:00+01:00
+- Decision time: 2026-11-23T02:00:00+01:00
+- Context/question: Review of the REFACTOR for "Invalid ID messages". C-024
+  made the parameter name a placeholder fed from
+  `ValidationError.TransactionIdParameter`.
+- Engineer feedback (verbatim): "actually, lets keep version with alias. It
+  still weird: template says its transactionId related error:
+  \"Error.NullTransactionId\" but there is still parameter with the name
+  ValidationError.TransactionIdParameter. Lets just place parameter name in
+  the template directly, bacause its strictly related with transaction id,
+  by itself."
+- Engineer decision:
+  1. Tests keep the `using Error = TransactionDeduplication.ValidationError;`
+     alias.
+  2. The templates contain the parameter name directly:
+     `TransactionId value '{0}' is not a valid Guid. (Parameter 'transactionId')`
+     and `TransactionId must not be null. (Parameter 'transactionId')`.
+     Messages are byte-identical to before.
+  3. `ValidationError.TransactionIdParameter` is removed. The exception types
+     set `ParamName` to `"transactionId"` themselves; the ParamName test
+     asserts the literal `"transactionId"` (the public parameter name of
+     `IsUniqueAndProcess`).
+- Also recorded: the engineer approved C-025 (exception types) together
+  with the GREEN commit 93104e1.
+- Affected work: `ValidationError`, the two exception types, AC-4 tests,
+  design document.
+- Status: Active; refines C-024 (the placeholder for the parameter name no
+  longer applies; the rest of C-024 and C-025 hold).

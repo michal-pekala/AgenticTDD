@@ -28,14 +28,14 @@ public sealed class InvalidTransactionIdTests : ExpirationTestsBase
         => FluentActions
             .Invoking(() => Sut.IsUniqueAndProcess(invalidId!))
             .Should().Throw<ArgumentException>()
-            .Which.ParamName.Should().Be(Error.TransactionIdParameter);
+            .Which.ParamName.Should().Be("transactionId");
 
     [Fact]
     public void Null_transaction_id_error_message_says_it_must_not_be_null()
         => Sut
             .AssertException<ArgumentNullException>(
                 null,
-                Error.NullTransactionId.Format(Error.TransactionIdParameter));
+                Error.NullTransactionId);
 
     [Theory]
     [InlineData("")]
@@ -47,7 +47,7 @@ public sealed class InvalidTransactionIdTests : ExpirationTestsBase
         => Sut
             .AssertException<ArgumentException>(
                 invalidId,
-                Error.InvalidTransactionId.Format(invalidId, Error.TransactionIdParameter));
+                Error.InvalidTransactionId.Format(invalidId));
 
     [Fact]
     public void Malformed_transaction_id_error_message_names_the_value()
@@ -56,7 +56,7 @@ public sealed class InvalidTransactionIdTests : ExpirationTestsBase
 
         Sut.AssertException<ArgumentException>(
             invalidId,
-            Error.InvalidTransactionId.Format(invalidId, Error.TransactionIdParameter));
+            Error.InvalidTransactionId.Format(invalidId));
     }
 
     [Theory]

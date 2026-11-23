@@ -74,7 +74,8 @@ public sealed class CapacityExceededException : Exception            // D-002, C
 |---|---|---|
 | New or expired ID accepted | returns `true` | AC-1, AC-3 |
 | Active duplicate | returns `false`, expiry refreshed | AC-2, AC-6 |
-| Null, empty, whitespace, malformed | `ArgumentException`, no state change; malformed message per C-006 | AC-4 |
+| Null | `NullTransactionIdException` (derives from `ArgumentNullException`), `ParamName` `transactionId`, no state change; message is `ValidationError.NullTransactionId` (C-022, C-024, C-025, C-026) | AC-4 |
+| Empty, whitespace, malformed | `InvalidTransactionIdException` (derives from `ArgumentException`), `ParamName` `transactionId`, no state change; message is `ValidationError.InvalidTransactionId` formatted with the value (C-006, C-022, C-024, C-025, C-026) | AC-4 |
 | New ID, buffer full of active IDs | `CapacityExceededException`, no state change | AC-6 |
 | Non-positive setting | `InvalidOperationException` naming the setting and value, no state change | AC-12 (C-012) |
 | Call after `Dispose` | `ObjectDisposedException` | (proposal, see below) |
@@ -91,7 +92,11 @@ public sealed class CapacityExceededException : Exception            // D-002, C
   GUID text format" (AC-4 assumption): `N`, `D`, `B`, `P`, `X`, any letter
   casing. `Guid.Empty` is a valid ID. Parsing and validation live in
   separate helpers (C-002); error templates live in `ValidationError` and are
-  formatted with `StringExtensions.Format` (C-006).
+  formatted with `StringExtensions.Format` (C-006). The templates contain the
+  whole message, including the ` (Parameter 'transactionId')` suffix, with the
+  parameter name written in them (C-024, C-026). Both exception types override
+  `Message` to return the formatted template, so .NET does not append the
+  suffix a second time (C-025).
 - Options are settable (C-020) and read once, at construction. Changing the
   options object later
   has no effect.
