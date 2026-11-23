@@ -173,11 +173,13 @@ stage boundary, suggest concrete ways to cut it, with a short reason
 for each:
 
 - continue in a new session: all state is in the repository (criteria,
-  logs, design, commits), so a fresh `/tdd-controller` can resume;
-  offer to start it with a hand-over brief (branch, HEAD, the stage
-  awaiting approval, agreed models). Title it `Iteration N: <scope>`,
-  numbering the pilot's controller sessions in order (for example
-  `Iteration 3: options read once, AC-5`);
+  logs, design, commits), so a fresh `/tdd-controller` can resume.
+  Write a hand-over brief (branch, HEAD, the stage awaiting approval,
+  agreed models) and report back. When this session was started by
+  another session, that upper session starts the next one, so the
+  iterations stay side by side under it; do not start it yourself.
+  Title it `Iteration N: <scope>`, numbering the pilot's controller
+  sessions in order (for example `Iteration 3: options read once, AC-5`);
 - turn off connectors the pilot does not use (in the composer's
   + > Connectors);
 - fewer, batched steps per stage;
