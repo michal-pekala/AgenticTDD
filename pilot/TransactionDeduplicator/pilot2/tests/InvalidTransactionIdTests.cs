@@ -22,12 +22,41 @@ public sealed class InvalidTransactionIdTests : ExpirationTestsBase
             .Invoking(() => Sut.IsUniqueAndProcess(invalidId!))
             .Should().Throw<ArgumentException>();
 
+    [Theory]
+    [MemberData(nameof(InvalidTransactionIds.All), MemberType = typeof(InvalidTransactionIds))]
+    public void Invalid_transaction_id_exception_names_the_parameter(string? invalidId)
+        => FluentActions
+            .Invoking(() => Sut.IsUniqueAndProcess(invalidId!))
+            .Should().Throw<ArgumentException>()
+            .Which.ParamName.Should().Be(Error.TransactionIdParameter);
+
+    [Fact]
+    public void Null_transaction_id_error_message_says_it_must_not_be_null()
+        => Sut
+            .AssertException<ArgumentNullException>(
+                null,
+                Error.NullTransactionId.Format(Error.TransactionIdParameter));
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("   ")]
+    [InlineData("\t")]
+    [InlineData("\t\r\n")]
+    public void Empty_or_whitespace_transaction_id_error_message_names_the_value(string invalidId)
+        => Sut
+            .AssertException<ArgumentException>(
+                invalidId,
+                Error.InvalidTransactionId.Format(invalidId, Error.TransactionIdParameter));
+
     [Fact]
     public void Malformed_transaction_id_error_message_names_the_value()
     {
         var invalidId = $"not-a-guid-{Guid.NewGuid()}";
 
-        Sut.AssertException<ArgumentException>(invalidId, Error.InvalidTransactionId.Format(invalidId));
+        Sut.AssertException<ArgumentException>(
+            invalidId,
+            Error.InvalidTransactionId.Format(invalidId, Error.TransactionIdParameter));
     }
 
     [Theory]
