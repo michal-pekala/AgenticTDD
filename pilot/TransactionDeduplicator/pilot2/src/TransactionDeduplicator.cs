@@ -2,7 +2,7 @@ namespace TransactionDeduplication;
 
 public sealed class TransactionDeduplicator
 {
-    private readonly TransactionDeduplicatorOptions _options;
+    private readonly TimeSpan _uniquenessCheckExpiration;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly Dictionary<Guid, DateTimeOffset> _lastAttempts = new();
 
@@ -19,7 +19,7 @@ public sealed class TransactionDeduplicator
         IDateTimeProvider dateTimeProvider,
         TimeSpan cleanerInterval)
     {
-        _options = options;
+        _uniquenessCheckExpiration = options.UniqnessCheckExpiration;
         _dateTimeProvider = dateTimeProvider;
     }
 
@@ -28,7 +28,7 @@ public sealed class TransactionDeduplicator
         var id = ParseTransactionId(transactionId);
         var now = _dateTimeProvider.CurrentTime;
         var isActive = _lastAttempts.TryGetValue(id, out var lastAttempt)
-            && now < lastAttempt + _options.UniqnessCheckExpiration;
+            && now < lastAttempt + _uniquenessCheckExpiration;
 
         _lastAttempts[id] = now;
 
