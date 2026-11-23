@@ -396,3 +396,31 @@ outcomes. The validation order keeps every rejection before any state change
   (unchanged). Done as its own RED/GREEN/REFACTOR cycle ("Options read once")
   before AC-5.
 - Status: Active
+
+### C-024 - Parameter suffix is part of the error templates
+
+- Recorded at: 2026-11-23T01:15:13+01:00
+- Decision time: 2026-11-23T01:15:13+01:00
+- Context/question: The first "Invalid ID messages" RED (6980954, rejected
+  and discarded) built the expected messages in the test with a helper that
+  appended the framework suffix ` (Parameter 'transactionId')`. The engineer
+  wants the whole message, suffix included, to live in `ValidationError`.
+- Engineer feedback (verbatim): "WithParameterSuffix -> it should be rather
+  part of Error.InvalidTransactionId - TransactionIdParameter to be included
+  there by default" and "The templates contain \" (Parameter '{1}')\" - let
+  the name of the parameter be parametrized, ok. But keep everything else a
+  part of error message".
+- Engineer decision: Invalid-ID templates in `ValidationError` contain the
+  suffix with the parameter name as a placeholder, e.g.
+  `TransactionId value '{0}' is not a valid Guid. (Parameter '{1}')` and
+  `TransactionId must not be null. (Parameter '{0}')`. The parameter name
+  `transactionId` is a `ValidationError` constant used by source and
+  tests. Tests compare the full `Message` with the formatted template and
+  build no part of it themselves. `ParamName` stays required (C-022).
+  Because .NET appends its own suffix to `ArgumentException.Message` when
+  `ParamName` is set, the thrown exception must not add it a second time;
+  the controller noted this needs an exception derived from
+  `ArgumentException` / `ArgumentNullException` (D-004 still holds); the
+  exact type is left to GREEN within that constraint.
+- Affected work: `ValidationError`, ID validation, AC-4 tests.
+- Status: Active; refines C-022.
