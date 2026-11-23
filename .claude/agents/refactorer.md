@@ -44,6 +44,10 @@ where each of its assertions went in your report.
 Refactor only when you can name a concrete benefit:
 
 - duplication across tests or source that a helper or base class removes;
+- tests with the same steps that differ only in one change, for example
+  to the options: extract a shared private method that takes the varying
+  part as a parameter (such as an `Action<Options>` that applies the
+  change), and make each test a call to it with its own change;
 - tests that pin down the same behavior and were made green by the same
   atomic change, which can be merged as described above;
 - code that is hard to read (tangled conditions, unclear names, long
