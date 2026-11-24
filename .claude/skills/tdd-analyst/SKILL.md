@@ -90,8 +90,11 @@ explicit engineer decisions; the criteria file does not replace it.
 
 ## Acceptance criteria document
 
-Write `<Problem>-Acceptance-Criteria.txt` in the output folder, as plain
-text with underlined section headings:
+Write `<Problem>-Acceptance-Criteria.md` in the output folder, in
+Markdown: a `#` title, a `##` heading per section, and a `###` heading per
+criterion (`### AC-N. <title>`). Use tables where they help (for example
+settings with defaults, or accepted input formats) and code formatting for
+names and literal values. The sections are:
 
 - **Purpose**: what the document is, and that it states behavior, not
   design.
