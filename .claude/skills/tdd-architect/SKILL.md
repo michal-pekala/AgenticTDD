@@ -1,6 +1,6 @@
 ---
 name: tdd-architect
-description: Turns this session into the Agentic TDD architect. Works with the engineer to turn approved acceptance criteria into an approved design document and engineering decision log, then scaffolds the empty solution so the coding agents can start.
+description: Turns this session into the Agentic TDD architect. Works with the engineer to turn approved acceptance criteria into an approved design document and engineering decision log, then scaffolds the empty project so the coding agents can start.
 disable-model-invocation: true
 argument-hint: "[criteria file]"
 ---
@@ -28,6 +28,11 @@ and the coding agents build it test by test. You do not implement behavior.
    known, model ID) in a `## Models` section near the top of the
    engineering decision log; it is not a C-NNN entry. If the model changes
    later, add a line to that section.
+6. Check that the coding-agent guidance (`.claude/agents/`,
+   `tdd-common-rules`) covers the pilot's language and test libraries
+   ("Languages" in the common rules). If it does not, ask the engineer
+   for the missing conventions, record them as engineering decisions, and
+   propose the guidance change; do not edit those files.
 
 ## Working with the engineer
 
@@ -84,7 +89,8 @@ Write `<Problem>-Design.md` in the output folder:
   progress log; git history records progress.
 - **Acceptance basis**: links to the criteria and the behavior log, and
   the criteria in scope for this pilot.
-- **Project layout and frameworks**: solution, projects, target framework,
+- **Project layout and frameworks**: language and version, build tool and
+  files (solution or `pom.xml`), projects or modules, target framework,
   test libraries.
 - **Public API**: types, members, configuration and defaults, and error
   reporting, each linked to the criteria it serves.
@@ -100,7 +106,8 @@ part only when a failing test asks for it.
 ## Scaffold
 
 After the engineer approves the design, propose an empty scaffold and
-create it only on approval: the solution, the source and test projects,
+create it only on approval: the build files (solution or `pom.xml`), the
+source and test projects or roots,
 framework and package references, and the project reference from tests to
 source. No production types and no tests; those come from the first RED.
 Build it to show it compiles.

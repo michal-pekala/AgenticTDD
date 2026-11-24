@@ -41,10 +41,30 @@ instructions and this file conflict, stop and ask the engineer.
 
 - Work in the engineer's checkout on the active pilot branch. Do not
   create, switch, or delete branches without engineer approval.
-- Keep code (solution, `src/`, `tests/`) in the pilot's code folder and
+- Keep code (build files, `src/`, `tests/`) in the pilot's code folder and
   engineering documents under `engineering/`; analyst artifacts stay under
   `analyst/`. Agent and shared-rule files live under `.claude/` at the
   repository root.
+
+## Languages
+
+The pilot's language, build tool, test libraries and commands are in its
+design document ("Project layout and frameworks") and engineering log.
+The agent rules are written in C# terms. For a Java pilot, read them
+through this mapping; where the pilot's log records a more specific rule,
+the log wins.
+
+| Rule term | C# (.NET) | Java (Maven) |
+|---|---|---|
+| `src/` / `tests/` (source / test root) | `src/`, `tests/` | `src/main/java/`, `src/test/java/` |
+| Build file | solution, `.csproj` | `pom.xml` |
+| Run all tests / one test | `dotnet test` / `--filter` | `mvn -q test` / `mvn -q -Dtest=Class#method test` |
+| Stub body that cannot return a default | throw `NotImplementedException` | throw `UnsupportedOperationException` |
+| Closed for inheritance | `sealed` | `final` |
+| Test-only access to seams | `internal` + `InternalsVisibleTo` | package-private, tests in the same package |
+| Extension method | static method in `Extensions/` | none: a helper method (see the agent's Java form) |
+| Constant holder | `static class`, `const string` | `final class`, private constructor, `static final String` |
+| Template formatting | `Format` extension, invariant culture | static `format(template, args)` with `Locale.ROOT` |
 
 ## Behavior versus design
 
@@ -64,13 +84,16 @@ instructions and this file conflict, stop and ask the engineer.
 ## Code conventions
 
 - Put every extension-method class under an `Extensions/` directory, in
-  source and test projects alike.
+  source and test projects alike. (Java: not applicable.)
 - Use `static` only for extension-method classes and constant-holder
   classes (such as error message templates). Do not make other members
-  `static` just because they use no instance state.
-- Classes are `sealed` unless they are designed for inheritance.
+  `static` just because they use no instance state. (Java: also stateless
+  helper classes, `final` with a private constructor, in place of
+  extension-method classes.)
+- Classes are `sealed` (Java: `final`) unless they are designed for
+  inheritance.
 - Prefer expression-bodied members for one-line implementations, in
-  source and test code alike.
+  source and test code alike. (Java: not applicable.)
 
 ## Commits and approval gates
 
