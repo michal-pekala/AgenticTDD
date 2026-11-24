@@ -100,7 +100,7 @@ public sealed class TransactionDeduplicator
         return TryUpdate(entry, lastAttempt, now) ? false : null;
     }
 
-    // Returns null when another call added or is adding the same ID and the caller must retry.
+    // Returns null when another call holds the claim for this ID, or has just added it, and the caller must retry.
     private bool? ProcessNew(
         Guid id,
         long now)
@@ -114,7 +114,14 @@ public sealed class TransactionDeduplicator
 
         try
         {
-            return _entries.ContainsKey(id) ? null : AddNew(id, now);
+            if (_entries.ContainsKey(id))
+            {
+                return null;
+            }
+
+            AddNew(id, now);
+
+            return true;
         }
         finally
         {
@@ -122,20 +129,14 @@ public sealed class TransactionDeduplicator
         }
     }
 
-    private bool? AddNew(
+    // Only the claim holder adds this ID, and it has checked that the ID is absent, so the add cannot collide.
+    private void AddNew(
         Guid id,
         long now)
     {
         ReserveSlot(now);
 
-        if (_entries.TryAdd(id, new Entry(now)))
-        {
-            return true;
-        }
-
-        Interlocked.Decrement(ref _retained);
-
-        return null;
+        _entries[id] = new Entry(now);
     }
 
     private void ReserveSlot(long now)

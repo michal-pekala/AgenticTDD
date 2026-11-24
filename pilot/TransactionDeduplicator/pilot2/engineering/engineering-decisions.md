@@ -510,3 +510,16 @@ outcomes. The validation order keeps every rejection before any state change
   atomic and still leaves rare windows.
 - Affected work: Operation (C-015) miss path; AC-7 (D-015).
 - Status: Proposal; would refine C-015 if approved.
+
+### C-028 - Engineer approval of C-027
+
+- Recorded at: 2026-11-24T12:00:00+01:00
+- Decision time: Engineer approval given in this iteration; exact time not
+  recorded (retrospective, entry time shown).
+- Decision: C-027 (per-ID claim before reserving a slot for a new ID) is
+  APPROVED as proposed. It supersedes the "lock-free" claim of C-015 for the
+  miss path: same-ID racers wait with `Thread.Yield` while the claim holder
+  finishes. Calls for different IDs, hits and the sweep are unaffected. The
+  rest of C-015 holds.
+- Affected work: Operation (C-015) in the design document, updated in the
+  `Thread safety [REFACTOR]` commit; AC-7 (D-015).
