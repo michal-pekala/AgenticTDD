@@ -479,3 +479,34 @@ outcomes. The validation order keeps every rejection before any state change
   That time was not measured: the entry was written in REFACTOR commit
   1b77740 at 2026-11-23T17:38:14+01:00, and the engineer decided C-026 shortly
   before. Read C-026's times as 2026-11-23T17:38:14+01:00 (retrospective).
+
+### C-027 - Per-ID claim before reserving a slot for a new ID (PROPOSAL)
+
+- Recorded at: 2026-11-24T11:25:35+01:00
+- Decision time: Not decided; implementer proposal pending engineer approval.
+- Context/question: RED commit 5f41d2b ("Same-ID race at last free slot").
+  Under C-015, call A reserves the last free slot and call B, racing for the
+  same unseen ID, fails its reservation, finds nothing to sweep and throws
+  `CapacityExceededException` before A's `TryAdd`. Re-checking the ID before
+  throwing leaves the window open, because A may still be between its
+  reservation and its `TryAdd`.
+- Proposal: on a miss, a call first claims the ID in a second
+  `ConcurrentDictionary<Guid, bool> _claims` (`TryAdd`). A call that loses the
+  claim yields and retries the loop. The claim holder re-checks
+  `_entries.ContainsKey(id)` (retry if present), then reserves a slot and
+  `TryAdd`s exactly as C-015 describes, and releases the claim in `finally`.
+  So at most one call per ID is ever between reservation and insert, and a
+  call throws only while it holds the claim and the ID is absent: any earlier
+  holder's insert happens before its claim release, which happens before the
+  next claim succeeds. `_entries` keeps the C-015 order (reserve, then
+  insert) and the AC-6 bound; `_claims` holds at most one key per in-flight
+  new-ID call.
+- Deviation from C-015: same-ID racers wait (spin with `Thread.Yield`) for the
+  claim holder, so the miss path for one ID is no longer lock-free; calls for
+  different IDs, hits, and the sweep are unaffected. Alternatives considered:
+  a pending placeholder entry in `_entries` (insert before reserve) keeps
+  racers waiting too and lets `_entries` exceed capacity transiently; a
+  "reservations still in flight" check (`_retained` versus `Count`) is not
+  atomic and still leaves rare windows.
+- Affected work: Operation (C-015) miss path; AC-7 (D-015).
+- Status: Proposal; would refine C-015 if approved.

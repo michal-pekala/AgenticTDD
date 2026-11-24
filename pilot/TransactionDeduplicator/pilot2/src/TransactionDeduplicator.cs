@@ -10,6 +10,7 @@ public sealed class TransactionDeduplicator
     private readonly int _uniquenessBufferCapacity;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ConcurrentDictionary<Guid, Entry> _entries = new();
+    private readonly ConcurrentDictionary<Guid, bool> _claims = new();
     private readonly Lock _sweepLock = new();
     private long _retained;
 
@@ -99,8 +100,29 @@ public sealed class TransactionDeduplicator
         return TryUpdate(entry, lastAttempt, now) ? false : null;
     }
 
-    // Returns null when another call added the same ID first and the caller must retry.
+    // Returns null when another call added or is adding the same ID and the caller must retry.
     private bool? ProcessNew(
+        Guid id,
+        long now)
+    {
+        if (!_claims.TryAdd(id, true))
+        {
+            Thread.Yield();
+
+            return null;
+        }
+
+        try
+        {
+            return _entries.ContainsKey(id) ? null : AddNew(id, now);
+        }
+        finally
+        {
+            _claims.TryRemove(id, out _);
+        }
+    }
+
+    private bool? AddNew(
         Guid id,
         long now)
     {
