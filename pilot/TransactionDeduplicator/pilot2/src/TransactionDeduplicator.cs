@@ -1,11 +1,17 @@
+using System.Collections.Concurrent;
+
 namespace TransactionDeduplication;
 
 public sealed class TransactionDeduplicator
 {
-    private readonly TimeSpan _uniquenessCheckExpiration;
+    private const long Removed = long.MinValue;
+
+    private readonly long _uniquenessCheckExpirationTicks;
     private readonly int _uniquenessBufferCapacity;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly Dictionary<Guid, DateTimeOffset> _lastAttempts = new();
+    private readonly ConcurrentDictionary<Guid, Entry> _entries = new();
+    private readonly Lock _sweepLock = new();
+    private long _retained;
 
     public TransactionDeduplicator()
         : this(
@@ -20,52 +26,143 @@ public sealed class TransactionDeduplicator
         IDateTimeProvider dateTimeProvider,
         TimeSpan cleanerInterval)
     {
-        _uniquenessCheckExpiration = options.UniqnessCheckExpiration;
+        _uniquenessCheckExpirationTicks = options.UniqnessCheckExpiration.Ticks;
         _uniquenessBufferCapacity = options.UniqnessBufferCapacity;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    internal int RetainedCount => _lastAttempts.Count;
+    internal int RetainedCount => _entries.Count;
 
     public bool IsUniqueAndProcess(string transactionId)
     {
         var id = ParseTransactionId(transactionId);
-        var now = _dateTimeProvider.CurrentTime;
-        var isKnown = _lastAttempts.TryGetValue(id, out var lastAttempt);
-        var isActive = isKnown && IsActive(lastAttempt, now);
+        var now = _dateTimeProvider.CurrentTime.UtcTicks;
 
-        if (!isKnown && _lastAttempts.Count >= _uniquenessBufferCapacity)
+        while (true)
         {
-            SweepExpired(now);
+            var isUnique = _entries.TryGetValue(id, out var entry)
+                ? ProcessKnown(id, entry, now)
+                : ProcessNew(id, now);
 
-            if (_lastAttempts.Count >= _uniquenessBufferCapacity)
+            if (isUnique.HasValue)
             {
-                throw new CapacityExceededException(_uniquenessBufferCapacity);
+                return isUnique.Value;
             }
         }
-
-        _lastAttempts[id] = now;
-
-        return !isActive;
     }
 
-    internal void SweepExpired() => SweepExpired(_dateTimeProvider.CurrentTime);
+    internal void SweepExpired() => SweepExpired(_dateTimeProvider.CurrentTime.UtcTicks);
 
-    private void SweepExpired(DateTimeOffset now)
+    private void SweepExpired(long now)
     {
-        foreach (var (id, lastAttempt) in _lastAttempts)
+        lock (_sweepLock)
         {
-            if (!IsActive(lastAttempt, now))
+            foreach (var (id, entry) in _entries)
             {
-                _lastAttempts.Remove(id);
+                var lastAttempt = Volatile.Read(ref entry.LastAttemptTicks);
+
+                if (lastAttempt != Removed
+                    && !IsActive(lastAttempt, now)
+                    && TryUpdate(entry, lastAttempt, Removed))
+                {
+                    Remove(id, entry);
+                }
             }
         }
     }
+
+    // Returns null when another call changed the entry first and the caller must retry.
+    private bool? ProcessKnown(
+        Guid id,
+        Entry entry,
+        long now)
+    {
+        var lastAttempt = Volatile.Read(ref entry.LastAttemptTicks);
+
+        if (lastAttempt == Removed)
+        {
+            Remove(id, entry);
+
+            return null;
+        }
+
+        if (!IsActive(lastAttempt, now))
+        {
+            return TryUpdate(entry, lastAttempt, now) ? true : null;
+        }
+
+        if (now <= lastAttempt)
+        {
+            return false;
+        }
+
+        return TryUpdate(entry, lastAttempt, now) ? false : null;
+    }
+
+    // Returns null when another call added the same ID first and the caller must retry.
+    private bool? ProcessNew(
+        Guid id,
+        long now)
+    {
+        ReserveSlot(now);
+
+        if (_entries.TryAdd(id, new Entry(now)))
+        {
+            return true;
+        }
+
+        Interlocked.Decrement(ref _retained);
+
+        return null;
+    }
+
+    private void ReserveSlot(long now)
+    {
+        if (TryReserveSlot())
+        {
+            return;
+        }
+
+        SweepExpired(now);
+
+        if (!TryReserveSlot())
+        {
+            throw new CapacityExceededException(_uniquenessBufferCapacity);
+        }
+    }
+
+    private bool TryReserveSlot()
+    {
+        if (Interlocked.Increment(ref _retained) <= _uniquenessBufferCapacity)
+        {
+            return true;
+        }
+
+        Interlocked.Decrement(ref _retained);
+
+        return false;
+    }
+
+    private void Remove(
+        Guid id,
+        Entry entry)
+    {
+        if (_entries.TryRemove(KeyValuePair.Create(id, entry)))
+        {
+            Interlocked.Decrement(ref _retained);
+        }
+    }
+
+    private bool TryUpdate(
+        Entry entry,
+        long expected,
+        long value)
+        => Interlocked.CompareExchange(ref entry.LastAttemptTicks, value, expected) == expected;
 
     private bool IsActive(
-        DateTimeOffset lastAttempt,
-        DateTimeOffset now)
-        => now < lastAttempt + _uniquenessCheckExpiration;
+        long lastAttempt,
+        long now)
+        => now - lastAttempt < _uniquenessCheckExpirationTicks;
 
     private Guid ParseTransactionId(string transactionId)
     {
@@ -80,5 +177,10 @@ public sealed class TransactionDeduplicator
         }
 
         return id;
+    }
+
+    private sealed class Entry(long lastAttemptTicks)
+    {
+        public long LastAttemptTicks = lastAttemptTicks;
     }
 }
