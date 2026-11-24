@@ -27,7 +27,8 @@ stop and report the question instead of guessing.
 - `src/`: signature-only stubs, so the test compiles. A stub is a new type,
   interface, method, property, or shared value such as an error message
   template. Method bodies only return a default value or throw
-  `NotImplementedException`. No logic, no branching, no state.
+  `NotImplementedException` (Java: `UnsupportedOperationException`). No
+  logic, no branching, no state.
 - The decision log: append only, per the common rules.
 
 Do not write anything else. Do not extract existing duplication into
@@ -68,8 +69,11 @@ job. Do not change existing tests unless the engineer approved it.
 
 ## Test style
 
-Use xUnit and FluentAssertions unless the pilot's decision log says
-otherwise.
+Use the pilot's test libraries (see "Languages" in the common rules and
+the pilot's design). The rules below are written in C# with xUnit and
+FluentAssertions. For a Java pilot, apply each one in the form given in
+"Java form" at the end of this section. Where the pilot's decision log
+records a more specific style, the log wins.
 
 ### Structure
 
@@ -179,6 +183,63 @@ otherwise.
           .Range(0, concurrentCalls)
           .Select(_ => Task.Run(func)));
   ```
+
+### Java form
+
+JUnit 5 (Jupiter) and AssertJ. Each C# rule above maps as follows:
+
+- Structure: test classes are package-private `final class`, in the same
+  package as the source, so they reach package-private seams. A shared
+  test base is an `abstract class`; fakes and helpers are package-private.
+  There are no `Fixture/` or `Extensions/` directories: everything is in
+  the one test package.
+- Options: `protected final Options options = new Options();` (mutable,
+  setters), or `private` in a single test class.
+- System under test: a `sut()` method that creates it on first call.
+  When it is `AutoCloseable`, an `@AfterEach` method closes it.
+- Aliases: Java has none. Use static imports of the error templates and
+  of `format(...)` in place of the `Error` alias.
+- Naming: snake_case method names, no `@DisplayName`:
+  `void expired_item_can_be_processed_again()`.
+- Layout: no expression bodies. One act and assertion per statement,
+  `assertThat(sut().process(id)).isTrue();`, with a blank line between the
+  steps of a scenario.
+- Inputs: `UUID.randomUUID()` for a representative valid value,
+  `"not-valid-" + UUID.randomUUID()` for a generic invalid one; literal
+  cases through `@ParameterizedTest` with `@ValueSource` (in place of
+  `InlineData`); random durations from `ThreadLocalRandom.current()` (in
+  place of `Random.Shared`).
+- Time: the fake implements the pilot's time seam (for example
+  `java.time.InstantSource`), starts at `Instant.now()` captured once, and
+  moves only by `advance(Duration)` (in place of `Now += ...`). Write
+  durations as `Duration.ofSeconds(10)`, `expiration.minusMillis(1)`,
+  `expiration.dividedBy(2)`.
+- Errors: reusable assertions are `protected` helper methods on the shared
+  test base class (Java has no extension methods):
+
+  ```java
+  protected <T extends Throwable> void assertException(
+          String input,
+          Class<T> type,
+          String expectedErrorMessage) {
+      assertThatThrownBy(() -> sut().process(input))
+              .isExactlyInstanceOf(type)
+              .hasMessage(expectedErrorMessage);
+  }
+  ```
+
+  Build the expected message from the source template:
+  `format(INVALID_ID, invalidId)`.
+- Concurrency: one generic helper on a fixed thread pool with a
+  `CountDownLatch` start gate, so the calls overlap:
+
+  ```java
+  protected <T> List<T> runConcurrent(Callable<T> call, int calls)
+  ```
+
+  with an overload that defaults `calls` to 16. Assert the returned
+  results directly. When a call can throw, pass a `Callable` that maps the
+  outcome to a value (for example a small `enum` or `record`) instead.
 
 ## Report
 

@@ -89,6 +89,28 @@ without changing another test, stop and report it; do not work around it.
 - A custom exception is `sealed` and builds its message from the template
   in its constructor, from the value it receives.
 
+### Java form
+
+For a Java pilot, apply the rules above in this form (see also
+"Languages" in the common rules):
+
+- Fields are `private final` and named `camelCase`, with no underscore.
+- The shared validation helper takes a `Predicate<T>` in place of
+  `Func<T, bool>`. Java has no named arguments; use a well-named local
+  variable or constant where a bare value would be unclear.
+- Time and other environment access go behind the smallest JDK type that
+  fits, such as `java.time.InstantSource`, rather than a new interface,
+  unless the pilot's design names one.
+- Options classes are `final`, with getters, setters and defaults.
+- Error templates are `static final String` fields in one `final` class
+  with a private constructor, in `String.format` syntax (`"Id value '%s'
+  is not valid."`), formatted by that class's static `format` method,
+  which uses `Locale.ROOT`.
+- A custom exception is `final` and unchecked (it extends
+  `RuntimeException` or a subclass), unless the design says otherwise.
+- A class that owns a thread or executor implements `AutoCloseable`;
+  `close()` is idempotent and declares no checked exception.
+
 ### Layout
 
 - Separate logically distinct statements with a blank line, including a

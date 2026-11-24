@@ -46,7 +46,8 @@ Refactor only when you can name a concrete benefit:
 - duplication across tests or source that a helper or base class removes;
 - tests with the same steps that differ only in one change, for example
   to the options: extract a shared private method that takes the varying
-  part as a parameter (such as an `Action<Options>` that applies the
+  part as a parameter (such as an `Action<Options>`, in Java a
+  `Consumer<Options>`, that applies the
   change), and make each test a call to it with its own change. Do this
   only when it makes the tests easier to read, not by rule: when the tests
   differ in more than that one change and the method needs several

@@ -20,7 +20,9 @@ condensed, Claude Code re-attaches only the first 5,000 tokens of a skill.
 2. Establish the pilot context and confirm it with the engineer:
    - the acceptance criteria file and the behavior decision log;
    - the engineering decision log and the design document;
-   - the code folder (solution, `src/`, `tests/`).
+   - the code folder (build file, source and test roots; for the
+     language mapping of `src/` and `tests/`, see "Languages" in the
+     common rules).
    If any of these is missing or unclear, ask. Do not guess paths.
 3. Check the starting state: the active pilot branch, a clean working
    tree, and a green test suite. Report anything else and stop.
@@ -110,7 +112,8 @@ conversation and is re-read on every later step.
   - implementer: `src/`, decision log;
   - refactorer: `src/`, `tests/`, design document, decision log.
 - **Stubs** (RED): read the `src/` diff. Bodies only return a default or
-  throw `NotImplementedException`; no logic.
+  throw `NotImplementedException` (Java: `UnsupportedOperationException`);
+  no logic.
 - **Tests**: run the whole suite yourself.
   - RED: only the new tests fail, with the failure the agent reported.
     Exception: when the engineer decided the behavior already exists, the
