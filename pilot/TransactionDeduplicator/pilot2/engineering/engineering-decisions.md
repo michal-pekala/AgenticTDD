@@ -523,3 +523,12 @@ outcomes. The validation order keeps every rejection before any state change
   rest of C-015 holds.
 - Affected work: Operation (C-015) in the design document, updated in the
   `Thread safety [REFACTOR]` commit; AC-7 (D-015).
+
+### Correction to C-028 timestamp
+
+- Recorded at: 2026-11-24T11:47:48+01:00
+- C-028 gives "Recorded at" as 2026-11-24T12:00:00+01:00. That time was not
+  measured and is later than the entry itself: C-028 was written in REFACTOR
+  commit dc2ea03 at 2026-11-24T11:43:48+01:00, and the engineer approved C-027
+  after GREEN commit baa8930 (2026-11-24T11:25:45+01:00). Read C-028's time
+  as 2026-11-24T11:43:48+01:00 (retrospective).
