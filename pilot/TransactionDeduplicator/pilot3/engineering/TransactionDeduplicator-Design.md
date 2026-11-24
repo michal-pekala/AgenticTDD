@@ -13,7 +13,7 @@ engineering log.
 - Behavior log: [behaviour-decisions.md](../analyst/behaviour-decisions.md)
   (D-001 to D-021).
 - Engineering log: [engineering-decisions.md](engineering-decisions.md)
-  (C-001 to C-028).
+  (C-001 to C-029).
 
 In scope for the TDD cycle: AC-1 to AC-9 and AC-12, verified by tests.
 AC-10 and AC-11 are verified by the benchmark module added after those tests

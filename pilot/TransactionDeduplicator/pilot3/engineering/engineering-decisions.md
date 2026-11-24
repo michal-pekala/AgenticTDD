@@ -555,3 +555,24 @@ No unresolved conflict.
     C-027 (pinned versions), which become Active.
 - Affected work: Public API, failure handling, scaffold, controller handoff.
 - Status: Active
+
+### C-029 - Agent guidance made reusable for Java
+
+- Recorded at: 2026-11-24T12:59:28+01:00
+- Decision time: 2026-11-24T12:59:28+01:00 (shortly before)
+- Context/question: C-024 overrides the C# test style for pilot 3 until the
+  guidance changes; `agent-guidance-proposal.md` proposed the change.
+- Engineer feedback (verbatim): "prepare data and new pilot3 dir for
+  controller. Update skill where necessary to be reusable for java as
+  well".
+- Engineer decision: Make the coding-agent guidance language-neutral, with
+  a Java form next to the C# rules: a "Languages" mapping in
+  `tdd-common-rules`, a "Java form" in `test-writer.md` (from C-024) and in
+  `implementer.md`, small wording changes in `refactorer.md`,
+  `tdd-controller` and `tdd-architect`. The C# rules are unchanged. The
+  change is applied as its own `Guidance:` commit by the session that owns
+  the worktree's `.claude/` folder; this architect session cannot write
+  there.
+- Affected work: Every coding stage of pilot 3 and later Java pilots. C-024
+  stays the pilot 3 rule; once the guidance commit lands, the two agree.
+- Status: Active

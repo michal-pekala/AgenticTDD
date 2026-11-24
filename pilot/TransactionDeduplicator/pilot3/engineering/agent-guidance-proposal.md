@@ -1,8 +1,11 @@
 # Proposal: Java support in the coding-agent guidance
 
-Status: proposal by the pilot 3 architect, 2026-11-24. Not applied. Per
-`tdd-common-rules` ("Changing guidance"), the engineer approves it and the
-controller applies it in a commit of its own.
+Status: approved by the engineer on 2026-11-24 (C-029). Per
+`tdd-common-rules` ("Changing guidance"), it goes in a `Guidance:` commit
+of its own, made by the session that owns the worktree's `.claude/` folder.
+The final text is wider than the list below: it also adds a "Languages"
+mapping to the common rules, a Java form to `implementer.md`, and a
+guidance-coverage check to `tdd-architect`.
 
 ## Problem
 
