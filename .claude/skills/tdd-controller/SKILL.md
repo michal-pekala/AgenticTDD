@@ -24,10 +24,35 @@ condensed, Claude Code re-attaches only the first 5,000 tokens of a skill.
    If any of these is missing or unclear, ask. Do not guess paths.
 3. Check the starting state: the active pilot branch, a clean working
    tree, and a green test suite. Report anything else and stop.
-4. Agree the criterion to work on. Use the one the engineer named;
+4. Agree the models (see "Models" below) and record them before the
+   first stage.
+5. Agree the criterion to work on. Use the one the engineer named;
    otherwise propose the next unimplemented criterion, preferring simple
    behavior and input validation before complex cases, and wait for
    confirmation.
+
+## Models
+
+- Show the session's model and each agent's default: the `model:` field
+  in `.claude/agents/<agent>.md` (unset means the session's model). Check
+  which models are available now; do not assume fixed model names.
+- Recommend a model per role, following "Models" in `docs/MANIFEST.md`:
+  - test-writer: the strongest reasoning model; its test is the
+    specification every later stage builds on.
+  - implementer: a strong coding model for simple criteria; the strongest
+    model for subtle ones (concurrency, lock-free code, resource lifetime).
+  - refactorer: a strong coding model.
+  - this controller session: the strongest reasoning model, because it
+    verifies every commit.
+  Say these are starting points, not measurements.
+- When this pilot will be compared with an earlier one, recommend keeping
+  that pilot's models so the comparison changes one thing at a time.
+- The engineer decides. Record the session model and each agent's model
+  (alias and, where known, the model ID) as an entry in the engineering
+  decision log before the first stage.
+- Pass the agreed model as the Agent call's `model` parameter for every
+  stage, even when it matches the default. A different model for one stage
+  or criterion needs engineer approval and its own log entry.
 
 ## The loop for one criterion
 
@@ -49,12 +74,32 @@ Each agent starts with a fresh context, so its prompt must contain
 everything it needs. Never pass on your own guesses about the
 implementation.
 
+A RED may also cover other criteria that the test-writer grouped with
+this one because one change satisfies them all. Check that the commit
+body names them; they are then done together with this criterion.
+
 When the criterion is done, summarize it (commits, tests added, open
 proposals) and ask before starting the next one.
 
 ## Verify before each approval
 
 Check these yourself; do not rely on the agent's report alone.
+
+Keep the number of steps low: every step re-reads the whole conversation,
+so it costs about the same however small it is. Run the git checks and
+the test suite in one command, and send independent calls (verification,
+the diff pane, the task list) together in one message.
+
+Read only what a check needs: everything you read stays in the
+conversation and is re-read on every later step.
+
+- Tests: print only the summary line; on failure, group failures by
+  reason (count and one message), never one line per test case.
+- Commit body: print the subject; search the body for what a check needs
+  (grouped criteria, mutation proof) instead of printing it.
+- Diffs: read the `src/` diff for RED stubs and the `tests/` diff when a
+  GREEN or REFACTOR touches tests. Otherwise `--stat` or `--name-only` is
+  enough; the engineer reads the code in the diff pane.
 
 - **One commit**: exactly one new commit since the last approved state
   (none for a skipped refactor), and a clean working tree.
@@ -68,18 +113,37 @@ Check these yourself; do not rely on the agent's report alone.
   throw `NotImplementedException`; no logic.
 - **Tests**: run the whole suite yourself.
   - RED: only the new tests fail, with the failure the agent reported.
+    Exception: when the engineer decided the behavior already exists, the
+    new tests pass; check the commit body names the mutation that made
+    each fail. GREEN is then skipped with engineer approval, and REFACTOR
+    follows as usual.
   - GREEN and REFACTOR: every test passes.
 - **No weakened tests** (GREEN and REFACTOR): the diff deletes no test and
   changes no assertion, input, or expected value. A rename or a move to a
-  shared helper is fine.
+  shared helper is fine. A REFACTOR may merge tests that pin down the same
+  behavior and went green with the same change; check that every
+  assertion, input, and expected value of the replaced tests is still in
+  the merged one.
 
 If a check fails, report exactly what failed. Do not fix it yourself.
 
 ## Presenting a stage
 
-Give the engineer a short summary: commit hash and subject, what changed,
+Give the engineer a short summary: commit hash and subject, the model
+that ran the stage, what changed,
 the test results you saw, the outcome of each check, and the agent's
 proposals and open questions. Then stop and wait.
+
+When the host can show a diff beside the conversation (for example the
+Claude desktop app's diff pane), open the diff of the stage's commit,
+scrolled to its main changed file, before presenting. Open it again after
+every stage: a diff of one commit does not follow later commits. Pass the
+commit's full hash as the scope; the Claude desktop app's pane may still
+open on "All changes", so also tell the engineer which row to click in
+the pane's Commits list (the stage's subject and short hash) to see only
+that commit. Open it in the same message
+as the verification commands, not as a step of its own. The pane is
+drawn by the host and costs almost no tokens.
 
 ## On rejection
 
@@ -96,6 +160,37 @@ proposals and open questions. Then stop and wait.
   files, and present them with their reasons.
 - Apply only the changes the engineer approves, in a commit of their own,
   never in a stage commit. Subject: `Guidance: <what changed>`.
+
+## Usage
+
+You cannot see the engineer's usage limit, but you can see what drives
+it: every step re-reads the whole conversation, so cost per step grows
+with its length. Watch for signs that usage is climbing fast: a long
+conversation (several criteria done, earlier stages such as analysis or
+design in the same session), repeated rejected attempts at one stage,
+many agent runs, or the engineer mentioning the limit. Then, at the next
+stage boundary, suggest concrete ways to cut it, with a short reason
+for each:
+
+- continue in a new session: all state is in the repository (criteria,
+  logs, design, commits), so a fresh `/tdd-controller` can resume.
+  Write a hand-over brief (branch, HEAD, the stage awaiting approval,
+  agreed models) and report back. When this session was started by
+  another session, that upper session starts the next one, so the
+  iterations stay side by side under it; do not start it yourself.
+  Title it `Iteration N: <scope>`, numbering the pilot's controller
+  sessions in order (for example `Iteration 3: options read once, AC-5`);
+- turn off connectors the pilot does not use (in the composer's
+  + > Connectors);
+- fewer, batched steps per stage;
+- a lighter model for a role, only with engineer approval and a log
+  entry.
+
+When a criterion is done, offer a fresh session for the next one even
+without these signs: about half of each step's cost is fixed overhead
+(tools, system prompt), and a short conversation keeps the rest small.
+
+Suggest; do not act on these without the engineer's approval.
 
 ## Never
 

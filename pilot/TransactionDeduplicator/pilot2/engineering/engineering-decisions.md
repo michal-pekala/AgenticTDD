@@ -12,6 +12,14 @@ test-style entries (commit gates, stage rules, test formatting) are skipped,
 because the pilot 2 agents' instructions cover them. Pilot 1's design
 document is not reused (C-010).
 
+## Models
+
+- Architect session (2026-10-19 to 2026-11-22): Opus 5.5
+  (`claude-opus-5-5`). Recorded retrospectively on 2026-11-22; the model was
+  not confirmed with the engineer at the start, because that step did not
+  exist yet.
+- Controller session and coding agents: see C-018, superseded by C-019.
+
 ## Decisions
 
 ### C-001 - Class library with a solution and separate source and test folders
@@ -244,3 +252,283 @@ document is not reused (C-010).
   risks and does not change any criterion.
 
 No unresolved conflict.
+
+### C-017 - Design approved, including its proposals
+
+- Recorded at: 2026-11-22T21:25:00+01:00
+- Decision time: 2026-11-22T21:25:00+01:00
+- Context/question: Approve `TransactionDeduplicator-Design.md`, including
+  the four items it marks "Proposal" and its namespaces.
+- Engineer decision: Approved as written:
+  - a `null` options argument throws `ArgumentNullException` from the
+    constructor (not configuration validation, so D-013 is unaffected);
+  - `IsUniqueAndProcess` checks in order: disposed, configuration (C-012),
+    then the ID (D-004, D-008), all before any state is touched;
+  - calls after `Dispose` throw `ObjectDisposedException`; `Dispose` is
+    idempotent;
+  - an exception in the cleaner timer callback is caught, stored, and
+    rethrown by the next `IsUniqueAndProcess` call;
+  - namespaces `TransactionDeduplication` and
+    `TransactionDeduplication.Tests`.
+- Affected work: Public API, failure handling, scaffold, controller handoff.
+- Status: Active
+
+## Consistency review after C-017
+
+C-017 adds API behavior outside the acceptance criteria (null options,
+disposal, cleaner failure). None of it changes an AC-1 to AC-12 outcome: the
+null-options check is an argument check, not configuration validation
+(D-013), and disposal and cleaner failure are outside the criteria's
+outcomes. The validation order keeps every rejection before any state change
+(AC-4, AC-6, AC-12). No conflict.
+
+### C-018 - Models for the controller and coding agents
+
+- Recorded at: 2026-11-22T21:45:44+01:00
+- Decision time: 2026-11-22T21:45:44+01:00
+- Context/question: Which models run the pilot 2 controller session and the
+  coding agents. The roadmap compares pilot 1 (one coding agent) with pilot
+  2 (three agents); changing models as well would mix two variables.
+- Engineer decision: Keep every role on Opus for pilot 2:
+  - controller session: Opus 5.5 (`claude-opus-5-5`);
+  - test-writer, implementer, refactorer: `model: opus` in their agent
+    files, currently resolving to Opus 5.5 (`claude-opus-5-5`), passed
+    explicitly on every agent call.
+  Per-role recommendations (for example a lighter coding model for simple
+  implementer and refactorer stages) are left for a later pilot that
+  measures them. Any per-stage change needs engineer approval and a new
+  entry.
+- Affected work: Every RED, GREEN and REFACTOR stage of pilot 2; the pilot 1
+  versus pilot 2 comparison.
+- Status: Active
+
+### C-019 - Best suggested model per role
+
+- Recorded at: 2026-11-22T21:47:35+01:00
+- Decision time: 2026-11-22T21:47:35+01:00
+- Context/question: C-018 kept every role on Opus so pilot 2 could be
+  compared with pilot 1 on one variable. The engineer does not need that:
+  models need not match pilot 1.
+- Engineer decision: Use the per-role models suggested by the controller
+  skill ("Models"):
+  - controller session: Opus 5.5 (`claude-opus-5-5`);
+  - test-writer: `opus` (Opus 5.5, `claude-opus-5-5`) for every
+    criterion;
+  - implementer: `sonnet` (Sonnet 5.5, `claude-sonnet-5-5`) for simple
+    criteria; `opus` for AC-5, AC-6 and AC-7, which carry the lock-free
+    compare-and-swap, slot counting and concurrent sweeping (C-015);
+  - refactorer: `sonnet` (Sonnet 5.5, `claude-sonnet-5-5`).
+  The controller passes the model explicitly on every agent call; the
+  agent files' `model: opus` defaults are not relied on. Any other
+  per-stage change needs engineer approval and a new entry.
+- Affected work: Every RED, GREEN and REFACTOR stage of pilot 2; the pilot 1
+  versus pilot 2 comparison now differs in models as well as in agent
+  split.
+- Status: Active; supersedes C-018.
+
+### C-020 - Option properties are settable
+
+- Recorded at: 2026-11-22T22:19:17+01:00
+- Decision time: 2026-11-22T22:19:17+01:00
+- Context/question: The AC-2 RED (d3c880b) showed a conflict: the
+  test-writer guidance holds configuration in a get-only `Options` property
+  whose object is mutable, with each test setting the values it needs as its
+  first statements; the approved design made the option properties
+  `init`-only, so tests could only set values in an object initializer.
+- Engineer decision: Make `UniqnessCheckExpiration` and
+  `UniqnessBufferCapacity` `{ get; set; }`. The deduplicator still reads
+  them once, at construction, so later changes have no effect. The AC-2 RED
+  commit d3c880b was rejected and discarded, to be redone with each test
+  setting its options as its first statements.
+- Affected work: `TransactionDeduplicatorOptions` (refines C-008); design
+  "Public API"; AC-2 RED and later tests.
+- Status: Active
+
+### C-021 - Criteria already satisfied: commit tests with a mutation proof
+
+- Recorded at: 2026-11-22T22:50:13+01:00
+- Decision time: 2026-11-22T22:50:13+01:00
+- Context/question: The AC-3 RED tests (exact expiration boundary, D-005)
+  all passed against the AC-2 GREEN code (56e93f3), whose `<` comparison
+  already expires an ID at exactly last attempt plus expiration. The
+  test-writer committed nothing. How should such a criterion be recorded?
+- Engineer decision: Commit the tests as `[RED]` with a body saying they
+  already pass. Prove each can fail by a temporary, uncommitted change to
+  `src/` (for AC-3, `<` changed to `<=` for the exact-boundary test), and
+  name that mutation in the commit body. GREEN is skipped; REFACTOR follows
+  as usual. Applies to AC-3 and to later criteria in the same situation;
+  the general rule is in the test-writer and controller guidance.
+- Affected work: AC-3 and any later already-satisfied criterion.
+- Status: Active
+
+### C-022 - Messages and ParamName for invalid transaction IDs
+
+- Recorded at: 2026-11-23T01:05:16+01:00
+- Decision time: 2026-11-23T01:05:16+01:00
+- Context/question: AC-4 left open the messages for null, empty and
+  whitespace-only IDs (only the malformed message, C-006, was decided) and
+  whether invalid-ID exceptions carry a `ParamName`. Null threw the
+  framework's `ArgumentNullException` message; empty and whitespace already
+  produced the C-006 message; no exception set `ParamName`.
+- Engineer decision: Empty and whitespace-only IDs keep the C-006 message
+  (`TransactionId value '<invalidId>' is not a valid Guid.`). A null ID
+  throws `ArgumentNullException` (an `ArgumentException`, so D-004 holds)
+  with its own `ValidationError` template, e.g. `TransactionId must not be
+  null.` Every invalid-ID exception sets `ParamName` to `transactionId`.
+  Tests assert `ParamName` separately and the full `Message`, including the
+  framework suffix ` (Parameter 'transactionId')`, for null, empty,
+  whitespace and malformed IDs.
+- Affected work: `ValidationError`, ID validation, AC-4 tests. Done as its
+  own RED/GREEN/REFACTOR cycle ("Invalid ID messages") before AC-5.
+- Status: Active; refines C-006.
+
+### C-023 - Options are read once, at construction
+
+- Recorded at: 2026-11-23T01:05:16+01:00
+- Decision time: 2026-11-23T01:05:16+01:00
+- Context/question: Option properties are settable (C-020) and the design
+  says options are read once at construction, but the code held the options
+  object by reference and no test covered a change after construction.
+- Engineer decision: Follow the design: the constructor copies the option
+  values; changing the options object after construction has no effect on
+  the instance. A test pins this through observable behaviour.
+- Affected work: `TransactionDeduplicator` construction; design "Public API"
+  (unchanged). Done as its own RED/GREEN/REFACTOR cycle ("Options read once")
+  before AC-5.
+- Status: Active
+
+### C-024 - Parameter suffix is part of the error templates
+
+- Recorded at: 2026-11-23T01:15:13+01:00
+- Decision time: 2026-11-23T01:15:13+01:00
+- Context/question: The first "Invalid ID messages" RED (6980954, rejected
+  and discarded) built the expected messages in the test with a helper that
+  appended the framework suffix ` (Parameter 'transactionId')`. The engineer
+  wants the whole message, suffix included, to live in `ValidationError`.
+- Engineer feedback (verbatim): "WithParameterSuffix -> it should be rather
+  part of Error.InvalidTransactionId - TransactionIdParameter to be included
+  there by default" and "The templates contain \" (Parameter '{1}')\" - let
+  the name of the parameter be parametrized, ok. But keep everything else a
+  part of error message".
+- Engineer decision: Invalid-ID templates in `ValidationError` contain the
+  suffix with the parameter name as a placeholder, e.g.
+  `TransactionId value '{0}' is not a valid Guid. (Parameter '{1}')` and
+  `TransactionId must not be null. (Parameter '{0}')`. The parameter name
+  `transactionId` is a `ValidationError` constant used by source and
+  tests. Tests compare the full `Message` with the formatted template and
+  build no part of it themselves. `ParamName` stays required (C-022).
+  Because .NET appends its own suffix to `ArgumentException.Message` when
+  `ParamName` is set, the thrown exception must not add it a second time;
+  the controller noted this needs an exception derived from
+  `ArgumentException` / `ArgumentNullException` (D-004 still holds); the
+  exact type is left to GREEN within that constraint.
+- Affected work: `ValidationError`, ID validation, AC-4 tests.
+- Status: Active; refines C-022.
+
+### C-025 - Exception types for invalid transaction IDs
+
+- Recorded at: 2026-11-23T01:30:00+01:00
+- Decision time: 2026-11-23T01:30:00+01:00
+- Context/question: C-024 left the exact exception types to GREEN. The
+  templates already contain the ` (Parameter '...')` suffix, and .NET adds
+  its own when `ParamName` is set.
+- Decision (implementer proposal, pending engineer approval): two internal
+  sealed types in `src/`: `InvalidTransactionIdException` (derives from
+  `ArgumentException`; empty, whitespace and malformed IDs) and
+  `NullTransactionIdException` (derives from `ArgumentNullException`; null).
+  Both set `ParamName` to `ValidationError.TransactionIdParameter` and
+  override `Message` to return the formatted template unchanged.
+- Affected work: ID validation, AC-4 (D-004 still holds).
+- Status: Active; refines C-024.
+
+### C-026 - Parameter name written in the error templates
+
+- Recorded at: 2026-11-23T02:00:00+01:00
+- Decision time: 2026-11-23T02:00:00+01:00
+- Context/question: Review of the REFACTOR for "Invalid ID messages". C-024
+  made the parameter name a placeholder fed from
+  `ValidationError.TransactionIdParameter`.
+- Engineer feedback (verbatim): "actually, lets keep version with alias. It
+  still weird: template says its transactionId related error:
+  \"Error.NullTransactionId\" but there is still parameter with the name
+  ValidationError.TransactionIdParameter. Lets just place parameter name in
+  the template directly, bacause its strictly related with transaction id,
+  by itself."
+- Engineer decision:
+  1. Tests keep the `using Error = TransactionDeduplication.ValidationError;`
+     alias.
+  2. The templates contain the parameter name directly:
+     `TransactionId value '{0}' is not a valid Guid. (Parameter 'transactionId')`
+     and `TransactionId must not be null. (Parameter 'transactionId')`.
+     Messages are byte-identical to before.
+  3. `ValidationError.TransactionIdParameter` is removed. The exception types
+     set `ParamName` to `"transactionId"` themselves; the ParamName test
+     asserts the literal `"transactionId"` (the public parameter name of
+     `IsUniqueAndProcess`).
+- Also recorded: the engineer approved C-025 (exception types) together
+  with the GREEN commit 93104e1.
+- Affected work: `ValidationError`, the two exception types, AC-4 tests,
+  design document.
+- Status: Active; refines C-024 (the placeholder for the parameter name no
+  longer applies; the rest of C-024 and C-025 hold).
+
+### Correction to C-026 timestamp
+
+- Recorded at: 2026-11-23T17:39:03+01:00
+- C-026 gives "Recorded at" and "Decision time" as 2026-11-23T02:00:00+01:00.
+  That time was not measured: the entry was written in REFACTOR commit
+  1b77740 at 2026-11-23T17:38:14+01:00, and the engineer decided C-026 shortly
+  before. Read C-026's times as 2026-11-23T17:38:14+01:00 (retrospective).
+
+### C-027 - Per-ID claim before reserving a slot for a new ID (PROPOSAL)
+
+- Recorded at: 2026-11-24T11:25:35+01:00
+- Decision time: Not decided; implementer proposal pending engineer approval.
+- Context/question: RED commit 5f41d2b ("Same-ID race at last free slot").
+  Under C-015, call A reserves the last free slot and call B, racing for the
+  same unseen ID, fails its reservation, finds nothing to sweep and throws
+  `CapacityExceededException` before A's `TryAdd`. Re-checking the ID before
+  throwing leaves the window open, because A may still be between its
+  reservation and its `TryAdd`.
+- Proposal: on a miss, a call first claims the ID in a second
+  `ConcurrentDictionary<Guid, bool> _claims` (`TryAdd`). A call that loses the
+  claim yields and retries the loop. The claim holder re-checks
+  `_entries.ContainsKey(id)` (retry if present), then reserves a slot and
+  `TryAdd`s exactly as C-015 describes, and releases the claim in `finally`.
+  So at most one call per ID is ever between reservation and insert, and a
+  call throws only while it holds the claim and the ID is absent: any earlier
+  holder's insert happens before its claim release, which happens before the
+  next claim succeeds. `_entries` keeps the C-015 order (reserve, then
+  insert) and the AC-6 bound; `_claims` holds at most one key per in-flight
+  new-ID call.
+- Deviation from C-015: same-ID racers wait (spin with `Thread.Yield`) for the
+  claim holder, so the miss path for one ID is no longer lock-free; calls for
+  different IDs, hits, and the sweep are unaffected. Alternatives considered:
+  a pending placeholder entry in `_entries` (insert before reserve) keeps
+  racers waiting too and lets `_entries` exceed capacity transiently; a
+  "reservations still in flight" check (`_retained` versus `Count`) is not
+  atomic and still leaves rare windows.
+- Affected work: Operation (C-015) miss path; AC-7 (D-015).
+- Status: Proposal; would refine C-015 if approved.
+
+### C-028 - Engineer approval of C-027
+
+- Recorded at: 2026-11-24T12:00:00+01:00
+- Decision time: Engineer approval given in this iteration; exact time not
+  recorded (retrospective, entry time shown).
+- Decision: C-027 (per-ID claim before reserving a slot for a new ID) is
+  APPROVED as proposed. It supersedes the "lock-free" claim of C-015 for the
+  miss path: same-ID racers wait with `Thread.Yield` while the claim holder
+  finishes. Calls for different IDs, hits and the sweep are unaffected. The
+  rest of C-015 holds.
+- Affected work: Operation (C-015) in the design document, updated in the
+  `Thread safety [REFACTOR]` commit; AC-7 (D-015).
+
+### Correction to C-028 timestamp
+
+- Recorded at: 2026-11-24T11:47:48+01:00
+- C-028 gives "Recorded at" as 2026-11-24T12:00:00+01:00. That time was not
+  measured and is later than the entry itself: C-028 was written in REFACTOR
+  commit dc2ea03 at 2026-11-24T11:43:48+01:00, and the engineer approved C-027
+  after GREEN commit baa8930 (2026-11-24T11:25:45+01:00). Read C-028's time
+  as 2026-11-24T11:43:48+01:00 (retrospective).

@@ -1,6 +1,7 @@
 ---
 name: refactorer
 description: Optional REFACTOR stage of Agentic TDD. Given an approved [GREEN] commit, decides whether a behavior-preserving cleanup of source or tests is worthwhile; if so, makes it, keeps every test green, commits [REFACTOR], and reports back; if not, reports the skip. Use when the controller starts the REFACTOR stage for a criterion.
+model: sonnet
 tools: Read, Grep, Glob, Edit, Write, Bash
 skills:
   - tdd-common-rules
@@ -30,11 +31,29 @@ assertion, or change an input or expected value. You may rename a test so
 its name matches the behavior it verifies, move tests between classes,
 and replace repeated code with a shared helper.
 
+Merging tests is the one allowed way to reduce their number. Merge two or
+more tests, possibly from different criteria, when their essential part
+(the behavior they pin down) is the same and the same atomic change in
+`src/` made them all green. The merged test, or a parameterized test,
+keeps every distinct assertion, input, and expected value of the tests it
+replaces, so nothing they verified is lost. Name each replaced test and
+where each of its assertions went in your report.
+
 ## Is it worthwhile?
 
 Refactor only when you can name a concrete benefit:
 
 - duplication across tests or source that a helper or base class removes;
+- tests with the same steps that differ only in one change, for example
+  to the options: extract a shared private method that takes the varying
+  part as a parameter (such as an `Action<Options>` that applies the
+  change), and make each test a call to it with its own change. Do this
+  only when it makes the tests easier to read, not by rule: when the tests
+  differ in more than that one change and the method needs several
+  parameters, they hide what the tests have in common, so leave the tests
+  as they are;
+- tests that pin down the same behavior and were made green by the same
+  atomic change, which can be merged as described above;
 - code that is hard to read (tangled conditions, unclear names, long
   methods) and can be made plainly simpler;
 - code the tests do not require that was added speculatively, when the

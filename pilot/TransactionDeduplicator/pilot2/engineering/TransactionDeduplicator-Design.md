@@ -2,7 +2,8 @@
 
 ## Status
 
-Proposed. Awaiting engineer approval.
+Approved by the engineer at 2026-11-22T21:25:00+01:00, including the items
+marked "Proposal" (C-017).
 
 ## Acceptance basis
 
@@ -49,10 +50,10 @@ pilot/TransactionDeduplicator/pilot2/
 ## Public API
 
 ```csharp
-public sealed class TransactionDeduplicatorOptions                  // C-008, D-009
+public sealed class TransactionDeduplicatorOptions                  // C-008, C-020, D-009
 {
-    public TimeSpan UniqnessCheckExpiration { get; init; } = TimeSpan.FromSeconds(10);
-    public int UniqnessBufferCapacity { get; init; } = 1_000_000;
+    public TimeSpan UniqnessCheckExpiration { get; set; } = TimeSpan.FromSeconds(10);
+    public int UniqnessBufferCapacity { get; set; } = 1_000_000;
 }
 
 public sealed class TransactionDeduplicator : IDisposable             // C-014
@@ -73,7 +74,8 @@ public sealed class CapacityExceededException : Exception            // D-002, C
 |---|---|---|
 | New or expired ID accepted | returns `true` | AC-1, AC-3 |
 | Active duplicate | returns `false`, expiry refreshed | AC-2, AC-6 |
-| Null, empty, whitespace, malformed | `ArgumentException`, no state change; malformed message per C-006 | AC-4 |
+| Null | `NullTransactionIdException` (derives from `ArgumentNullException`), `ParamName` `transactionId`, no state change; message is `ValidationError.NullTransactionId` (C-022, C-024, C-025, C-026) | AC-4 |
+| Empty, whitespace, malformed | `InvalidTransactionIdException` (derives from `ArgumentException`), `ParamName` `transactionId`, no state change; message is `ValidationError.InvalidTransactionId` formatted with the value (C-006, C-022, C-024, C-025, C-026) | AC-4 |
 | New ID, buffer full of active IDs | `CapacityExceededException`, no state change | AC-6 |
 | Non-positive setting | `InvalidOperationException` naming the setting and value, no state change | AC-12 (C-012) |
 | Call after `Dispose` | `ObjectDisposedException` | (proposal, see below) |
@@ -90,8 +92,13 @@ public sealed class CapacityExceededException : Exception            // D-002, C
   GUID text format" (AC-4 assumption): `N`, `D`, `B`, `P`, `X`, any letter
   casing. `Guid.Empty` is a valid ID. Parsing and validation live in
   separate helpers (C-002); error templates live in `ValidationError` and are
-  formatted with `StringExtensions.Format` (C-006).
-- Options are read once, at construction. Changing the options object later
+  formatted with `StringExtensions.Format` (C-006). The templates contain the
+  whole message, including the ` (Parameter 'transactionId')` suffix, with the
+  parameter name written in them (C-024, C-026). Both exception types override
+  `Message` to return the formatted template, so .NET does not append the
+  suffix a second time (C-025).
+- Options are settable (C-020) and read once, at construction. Changing the
+  options object later
   has no effect.
 
 ## Internal design
@@ -128,19 +135,28 @@ An entry is active when `now < LastAttemptTicks + expiration` (D-005).
      - Active: if `now <= old`, return `false` (another call already refreshed
        to a later time). Otherwise CAS `old -> now`; success returns `false`,
        failure retries.
-   - **Miss**: reserve a slot: `Interlocked.Increment(ref _retained)`. If the
-     result exceeds capacity, undo the increment, run a pressure sweep
-     (below) and try to reserve once more; if it is still over, undo and
-     throw `CapacityExceededException`. With a slot reserved,
-     `TryAdd(id, new Entry(now))`: success returns `true`; failure (another
-     call added the same ID) undoes the reservation and retries the loop,
-     where it is then a hit.
-3. Every retry is caused by another call's successful CAS, insert or
-   removal, so the loop is lock-free: some call always makes progress.
+   - **Miss**: first claim the ID: `_claims.TryAdd(id, true)` (C-027). If
+     another call holds the claim, `Thread.Yield()` and retry the loop. The
+     claim holder re-checks `_entries.ContainsKey(id)` (present: retry, where
+     it is a hit). Otherwise it reserves a slot:
+     `Interlocked.Increment(ref _retained)`. If the result exceeds capacity,
+     undo the increment, run a pressure sweep (below) and try to reserve once
+     more; if it is still over, undo and throw `CapacityExceededException`.
+     With a slot reserved, it adds `new Entry(now)` (no collision is possible:
+     only the claim holder adds this ID and it saw the ID absent), returns
+     `true`, and releases the claim in `finally`.
+3. Retries on a hit are caused by another call's successful CAS, insert or
+   removal, so the hit path is lock-free. The miss path for one ID is not
+   (C-027): same-ID racers wait for the claim holder to finish. Calls for
+   different IDs, hits and the sweep do not wait on a claim. The claim also
+   means a call throws `CapacityExceededException` only while it holds the
+   claim and the ID is absent, so a same-ID racer can never be rejected
+   because another racer holds the last slot.
 
 Why the criteria hold:
 
-- **AC-7, exactly one `true`**: for an unseen ID, only one `TryAdd` succeeds;
+- **AC-7, exactly one `true`**: for an unseen ID, only the claim holder
+  adds it (C-027);
   for an expired ID, only one CAS from the expired value succeeds. Every
   other racer then sees an active entry and returns `false`.
 - **AC-6, bound**: `_retained` counts reserved plus stored entries and is

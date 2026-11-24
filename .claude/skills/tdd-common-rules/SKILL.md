@@ -95,3 +95,6 @@ instructions and this file conflict, stop and ask the engineer.
   without evidence from a command you ran.
 - When handing off, report the commands run and their outcomes, any
   unapproved decisions, and any unresolved risks.
+- Keep the report short: the controller re-reads it on every later step.
+  Group test results by failure reason with a count; do not list every
+  test case or paste code the commit already holds.

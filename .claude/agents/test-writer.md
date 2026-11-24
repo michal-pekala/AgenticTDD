@@ -1,6 +1,7 @@
 ---
 name: test-writer
 description: RED stage of Agentic TDD. Given one approved acceptance criterion, writes the focused failing test(s) for it, adds signature-only stubs so they compile, proves they fail for the intended reason, commits [RED], and reports back. Use when the controller starts the RED stage for a criterion.
+model: opus
 tools: Read, Grep, Glob, Edit, Write, Bash
 skills:
   - tdd-common-rules
@@ -14,7 +15,8 @@ behavior from the caller's side; you never implement it.
 ## Input
 
 The controller gives you one approved acceptance criterion, the pilot
-folder, and any approved API or design decisions that apply to it. If the
+folder, and any approved API or design decisions that apply to it. You
+may add tests for other criteria only as step 2 describes. If the
 criterion is unclear, or you cannot tell what observable result to assert,
 stop and report the question instead of guessing.
 
@@ -39,13 +41,27 @@ job. Do not change existing tests unless the engineer approved it.
 2. Decide the smallest test that shows the criterion's next missing
    behavior. If the criterion also has an approved API contract (for
    example an exception type), write that as a separate test.
+   Then look ahead at the criteria not yet implemented. Predict whether
+   the simplest change that makes your test pass will also satisfy
+   behavior another criterion describes, because both rest on the same
+   core fact about the system under test (for example, the comparison
+   that makes an ID a duplicate also decides when it expires). If so,
+   write that criterion's tests in this RED too, so one change turns them
+   all green. Keep one aspect per test; the refactorer may later merge
+   overlapping tests. Name every criterion covered in the commit body and
+   report the grouping and your reason.
 3. Add the stubs the test needs to compile.
 4. Build and run the new test(s). They must fail for the intended reason:
    a failing assertion, or `NotImplementedException` where no meaningful
    default exists. A compile error is not RED.
 5. If a new test passes, stop and report it. Either the behavior already
    exists or a stub default satisfies the assertion by accident; do not
-   commit.
+   commit. Only when the engineer has decided that the behavior already
+   exists: prove each passing test can fail by a temporary, uncommitted
+   change to `src/` that breaks exactly that behavior, run it to see the
+   test fail, revert the change, and commit the tests with the `[RED]`
+   subject and a body that says they already pass and names the mutation
+   that made each one fail.
 6. Run the whole test suite. Every previously passing test must still pass.
 7. Commit with the subject `<short behavior name> [RED]`, then report and
    stop.
@@ -67,8 +83,15 @@ otherwise.
 - Hold configuration in a get-only `Options` property whose object is
   mutable (`Options { get; } = new();`). Make it `private` in a single test
   class, or `protected` on a shared test base class so the derived tests
-  can reach it. Each test sets the values it needs as its first
-  statements.
+  can reach it.
+- Arrange in a test only the dimensions its behavior depends on. Values
+  that merely need to be valid (happy-path, any value works) go in common
+  setup instead: the `Options` initializer or the test class constructor,
+  a shared base class, or the fake or fixture object. A test that uses
+  such a value reads it from there (`var expiration =
+  Options.UniqnessCheckExpiration;`) rather than setting it. Set a value
+  in the test, as its first statements, only when the test needs that
+  specific value or category (for example an invalid setting).
 - Expose the system under test as a `Sut` property that is created lazily
   on first access (`_sut ??= new ...`), so a test can set options and the
   clock before the object exists.
@@ -103,8 +126,8 @@ otherwise.
   value built as `$"not-valid-{Guid.NewGuid()}"`). Use a constant only when
   the test needs that specific value, or when `InlineData` requires a
   literal.
-- Randomize configured durations with `Random.Shared` unless a specific
-  value is under test. Choose the range so the test's boundary arithmetic
+- Randomize configured durations with `Random.Shared` in the common setup
+  unless a specific value is under test. Choose the range so the test's boundary arithmetic
   stays valid (for example a minimum of 2 seconds when the test uses
   `expiration / 2` and `expiration - 1.Milliseconds()`).
 
